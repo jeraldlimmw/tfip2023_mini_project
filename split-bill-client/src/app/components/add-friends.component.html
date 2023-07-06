@@ -1,0 +1,52 @@
+<div>
+    <h1>Create New Bill</h1>
+</div>
+<div>
+    <form [formGroup]="form" (submit)="saveFriends()">
+        <table>
+            <tr>
+                <td>Bill Title: </td>
+                <td>
+                    <input type="text" size="30" formControlName="title">
+                </td>
+            </tr>
+            <tr>
+                <td>Total Expenditure: </td>
+                <td>
+                    $ <input type="number" formControlName="total">
+                </td>
+            </tr>
+        </table>
+        <hr>
+        <table>
+            <thead>
+                <tr>
+                    <td>Friends:</td>
+                    <td>Amount Paid:</td>
+                </tr>
+            </thead>
+            <tbody formArrayName="friends">
+                <tr *ngFor="let f of friendsArr.controls; let i = index" [formGroupName]="i">
+                    <td>
+                        <input type="text" size="30" formControlName="name">
+                    </td>
+                    <td>
+                        <input type="number" formControlName="amount">
+                    </td>
+                    <td>
+                        <button type="button" (click)="removeFriend(i)">X</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button type="button" (click)="addFriend(null)">
+                            add another friend
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <button type="submit">Next: Add items</button>
+    </form>
+</div>

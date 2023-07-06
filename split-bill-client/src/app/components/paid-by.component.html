@@ -1,0 +1,32 @@
+<h1>Bill Paid By</h1>
+<div>
+    <table>
+        <tr>
+            <td>Bill Title: </td>
+            <td>{{ currentBill.title }}</td>
+        </tr>
+        <tr>
+            <td>Total: </td>
+            <td>$ {{ currentBill.total }}</td>
+        </tr>
+    </table>
+    <hr>
+    <form [formGroup]="paidByForm">
+        <table formArrayName="paidBy">
+            <tr *ngFor="let f of currentBill.friends">
+                <td>
+                    {{ f }}
+                </td>
+                <td>
+                    <input type="number" formControlName="amount">
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+        <button type="submit">Next: Add Items</button>
+        <button type="button">Back</button>
+    </form>      
+</div>

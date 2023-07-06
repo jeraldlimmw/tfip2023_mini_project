@@ -1,0 +1,79 @@
+<div>
+    <h1>
+        Add items to bill
+    </h1>
+</div>
+<div>
+    <table>
+        <tr>
+            <td>Bill Title: </td>
+            <td>{{ currentBill.title }}</td>
+        </tr>
+        <tr>
+            <td>Total Expenditure: </td>
+            <td>$ {{ currentBill.total }}</td>
+        </tr>
+    </table>
+    <hr>
+    <form [formGroup]="form" (submit)="saveBill()">
+        <table>
+            <thead>
+                <tr>
+                    <td>Item</td>
+                    <td>Price</td>
+                    <td>Quantity</td>
+                    <td *ngFor="let f of currentBill.friends">{{ f }}</td>
+                </tr>
+            </thead>
+            <tbody formArrayName="items">
+                <tr *ngFor="let item of itemArr.controls; let i = index" [formGroupName]="i">
+                    <td>
+                        <input type="text" size="30" formControlName="itemName">
+                    </td>
+                    <td>
+                        $ <input type="number" formControlName="price">
+                    </td>
+                    <td>
+                        x <input type="number" formControlName="quantity">
+                    </td>
+                    <td *ngFor="let f of currentBill.friends; let j = index">
+                        <input type="checkbox" value="{{ f }}" formControlName="p{{ j }}">
+                    </td>
+                    <td>
+                        <button type="button" (click)="removeItem(i)">X</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button type="button" (click)="addItem(null)">Add Item</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <table>
+            <tr>
+                <td>Service: </td>
+                <td>
+                    <input type="number" formControlName="service">%
+                </td>
+            </tr>
+            <tr>
+                <td>Tax (GST): </td>
+                <td>
+                    <input type="number" formControlName="tax">%
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table>
+            <tr>
+                <td>Calculated Total: </td>
+                <td>(match cal total with exp total)</td>
+            </tr>
+        </table>
+        <br>
+        <button type="submit">Split bill</button>
+        <button type="button">Back</button>
+    </form>
+</div>
