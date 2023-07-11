@@ -33,9 +33,9 @@ public class TransactionRepository {
         SqlRowSet rs = jdbcTemplate.queryForRowSet(SELECT_TRANSACTIONS_BY_BILL_ID, id);
 
         List<Transaction> tList = new LinkedList<>();
-        Transaction t = new Transaction();
-        
+
         while (rs.next()) {
+            Transaction t = new Transaction();
             t.setId(rs.getString("id"));
             t.setBillId(rs.getString("billId"));
             t.setPayee(rs.getString("payee"));

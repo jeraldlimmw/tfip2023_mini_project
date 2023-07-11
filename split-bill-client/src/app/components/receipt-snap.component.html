@@ -1,0 +1,8 @@
+<div>
+    <h2>Take a photo of your receipts</h2>
+    <p>You can include more than one receipt in the photo. Please ensure the receipts are against a plain background and the words are clear and visible.</p>
+    <webcam [width]="viewWidth" [height]="viewHeight" 
+            [trigger]="trigger$" (imageCapture)="image($event)"></webcam>
+    <br>
+    <button type="button" (click)="snap()">Snap!</button>
+</div>

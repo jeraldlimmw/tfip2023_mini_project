@@ -9,11 +9,20 @@
                 <td>
                     <input type="text" size="30" formControlName="title">
                 </td>
+                <td>
+                    <span *ngIf="invalidField('title')">
+                        Invalid title
+                    </span>
+                </td>
             </tr>
             <tr>
                 <td>Total Expenditure: </td>
                 <td>
-                    $ <input type="number" formControlName="total">
+                    $ {{ totalAmount }}
+                    <!-- <input type="number" formControlName="total"> -->
+                    <span *ngIf="totalAmount < 1">
+                        (Total expenditure must be more than $1.00)
+                    </span>
                 </td>
             </tr>
         </table>
@@ -31,10 +40,16 @@
                         <input type="text" size="30" formControlName="name">
                     </td>
                     <td>
-                        <input type="number" formControlName="amount">
+                        $<input type="number" formControlName="amount" (input)="calculateTotalAmount()">
                     </td>
                     <td>
-                        <button type="button" (click)="removeFriend(i)">X</button>
+                        <button type="button" (click)="removeFriend(i)"
+                                [disabled]="lessThanThreeFriends()">X</button>
+                    </td>
+                    <td>
+                        <span *ngIf="invalidFriendName(i, 'name')">
+                            Name must be more than 2 characters
+                        </span>
                     </td>
                 </tr>
                 <tr>
@@ -47,6 +62,6 @@
             </tbody>
         </table>
         <br>
-        <button type="submit">Next: Add items</button>
+        <button type="submit" [disabled]="invalidForm()">Next: Add items</button>
     </form>
 </div>

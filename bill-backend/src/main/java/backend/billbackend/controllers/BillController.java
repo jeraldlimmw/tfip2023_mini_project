@@ -1,5 +1,7 @@
 package backend.billbackend.controllers;
 
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,6 +19,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import backend.billbackend.models.Bill;
+import backend.billbackend.models.Settlement;
 import backend.billbackend.services.SplitService;
 
 @Controller
@@ -26,28 +29,47 @@ public class BillController {
     private SplitService splitSvc;
 
     // Post method to get Bill object
-    @PostMapping()
+    @PostMapping(path="/store")
     @ResponseBody
     public ResponseEntity<String> postBill(@RequestBody String json) throws JsonMappingException, JsonProcessingException {
-        System.out.println(">>>> Controller: Json " + json);
-        ObjectMapper objectMapper = new ObjectMapper();
-        Bill bill = objectMapper.readValue(json, Bill.class);
+        // System.out.println(">>>> Controller: Json " + json);
+        ObjectMapper mapper = new ObjectMapper();
+        Bill bill = mapper.readValue(json, Bill.class);
         System.out.println(">>>> Controller: Bill received " + bill);
 
         String billId = splitSvc.split(bill);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
+        if (Objects.isNull(billId)) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body("{ billId : \"" + billId + "\" }");
+                    .body("{ error : bill not stored }");
+        } else {
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{ \"billId\" : \"" + billId + "\" }");
+        }
     }
 
     // Get Settlement with array of transactions based on bill
-    @GetMapping(path="/{id}")
+    @GetMapping(path="/settlement/{id}")
     @ResponseBody
     public ResponseEntity<String> getSettlementFromBillId(@PathVariable String id) {
-        splitSvc.getSettlement(id);
+        Settlement settlement = splitSvc.getSettlement(id);
+        
+        if (Objects.isNull(settlement)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{ error : billId not found }");
+        }
 
+        ObjectMapper mapper = new ObjectMapper();
+        String settlementJson = "";
+        try {
+            settlementJson = mapper.writeValueAsString(settlement);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         return ResponseEntity.ok()
-                    .body(null);
+                    .body(settlementJson);
     }
 }

@@ -2,13 +2,15 @@ package backend.billbackend.models;
 
 import java.util.List;
 
+import jakarta.json.JsonObject;
+
+
 public class Item {
     private String itemName;
     private Double price;
     private Integer quantity;
-    private List<Integer> share;
-    private List<Double> percentShare;
-    // private List<String> people;
+    private List<Integer> shares;
+    private List<Double> percentShares;
     
     public String getItemName() {
         return itemName;
@@ -28,22 +30,31 @@ public class Item {
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
-    public List<Integer> getShare() {
-        return share;
+    public List<Integer> getShares() {
+        return shares;
     }
-    public void setShare(List<Integer> share) {
-        this.share = share;
+    public void setShares(List<Integer> shares) {
+        this.shares = shares;
     }
-    public List<Double> getPercentShare() {
-        return percentShare;
+    public List<Double> getPercentShares() {
+        return percentShares;
     }
-    public void setPercentShare(List<Double> percentShare) {
-        this.percentShare = percentShare;
+    public void setPercentShares(List<Double> percentShares) {
+        this.percentShares = percentShares;
     }
 
     @Override
     public String toString() {
-        return "Item [itemName=" + itemName + ", price=" + price + ", quantity=" + quantity + ", share=" + share
-                + ", percentShare=" + percentShare + "]";
+        return "Item [itemName=" + itemName + ", price=" + price + ", quantity=" 
+                + quantity + ", shares=" + shares
+                + ", percentShares=" + percentShares + "]";
+    }
+
+    public static Item createReceiptItem(JsonObject jo) {
+        Item i = new Item();
+        i.setItemName(jo.getString("description"));
+        i.setPrice((jo.getJsonNumber("amount").bigDecimalValue()).doubleValue());
+        i.setQuantity(1);
+        return i;
     }
 }

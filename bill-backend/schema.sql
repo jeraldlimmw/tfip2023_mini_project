@@ -1,0 +1,7 @@
+create table Transactions(
+id VARCHAR(9) NOT NULL PRIMARY KEY,
+billId VARCHAR(8) NOT NULL,
+payer VARCHAR(50) NOT NULL,
+payee VARCHAR(50) NOT NULL,
+amount DECIMAL(10,2) NOT NULL
+);

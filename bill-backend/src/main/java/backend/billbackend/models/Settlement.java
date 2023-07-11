@@ -4,6 +4,7 @@ import java.util.List;
 
 public class Settlement {
     private String billId;
+    private Double total;
     private String title;
     private List<Transaction> transactions;
     private long timestamp;
@@ -14,12 +15,18 @@ public class Settlement {
     public Settlement(String billId) {
         this.billId = billId;
     }
-    
+
     public String getBillId() {
         return billId;
     }
     public void setBillId(String billId) {
         this.billId = billId;
+    }
+    public Double getTotal() {
+        return total;
+    }
+    public void setTotal(Double total) {
+        this.total = total;
     }
     public String getTitle() {
         return title;
@@ -42,7 +49,7 @@ public class Settlement {
 
     @Override
     public String toString() {
-        return "Settlement [billId=" + billId + ", title=" + title + ", transactions=" + transactions
-                + ", timestamp=" + timestamp + "]";
-    }    
+        return "Settlement [billId=" + billId + ", total=" + total + ", title=" + title + ", transactions="
+                + transactions + ", timestamp=" + timestamp + "]";
+    }
 }

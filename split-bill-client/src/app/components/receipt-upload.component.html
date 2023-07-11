@@ -1,0 +1,16 @@
+<div>
+    <img [src]="photo" width="400">
+</div>
+<br>
+<div>
+    <table>
+        <tr>
+            <td>
+                <button type="button" [routerLink]="[ '/receipt' ]">Back</button>
+            </td> 
+            <td>
+                <button type="button" (click)="upload()">Upload</button>
+            </td> 
+            </tr>
+    </table>
+</div>

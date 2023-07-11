@@ -3,9 +3,11 @@ package backend.billbackend.services;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +39,7 @@ public class SplitService {
         // TODO: add transactional, and put SQL in front of Mongo so that it can rollback
         // Store Bill in Mongo
         bill.setBillID(generateUUID());
+        bill.setTimestamp(DateTime.now().getMillis());
 
         List<String> payeeNames = new ArrayList<>();
 
@@ -68,8 +71,12 @@ public class SplitService {
 
     public Settlement getSettlement(String id) {
         Bill b = billRepo.findBillById(id);
+        if (Objects.isNull(b)) {
+            return null;
+        }
         Settlement s = new Settlement(id);
         s.setTitle(b.getTitle());
+        s.setTotal(b.getTotal());
         s.setTimestamp(b.getTimestamp());
         s.setTransactions(transRepo.findTransactionsByBillId(id));
         System.out.println(">>>> Service: Settlement " + s);
@@ -77,17 +84,37 @@ public class SplitService {
     }
 
     private void addExpenses(Bill bill) {
+        // if bill is in shares, create percentShares array
+        if (!bill.getByPercentage()){
+            for (Item i : bill.getItems()) {
+                // calculate total shares
+                double totalShares = 0.0;
+                for (int s : i.getShares()) {
+                    totalShares += s;
+                }
+                // create and set percentShares list
+                List<Double> ps = new ArrayList<>();
+                for (int s : i.getShares()) {
+                    double p = (s > 0) ? (s/totalShares) : 0.0;
+                    ps.add(p);
+                }
+                i.setPercentShares(ps);
+            }
+        }
+        // for each item, add expense to the users
         for (Item i : bill.getItems()) {
             System.out.println(">>>> Service: Item i = " + i);
             double finalPrice = 
-                    (i.getPrice() * (bill.getService() + 1)) * (bill.getTax() + 1);
-            double sharePerPax = finalPrice / i.getPeople().size();
-            System.out.println(">>>> Service: per share of " + i.getItemName() + " = " + sharePerPax);
-            for (User u : users) {
-                if (i.getPeople().contains(u.getName())) {
-                    u.setExpense(u.getExpense() + sharePerPax);
+                    (i.getPrice() * i.getQuantity() * (1.0 + bill.getService()/100) 
+                            * (1.0 + bill.getTax()/100));
+            for (int j = 0; j < bill.getFriends().size(); j++) {
+                double expenditure = i.getPercentShares().get(j) * finalPrice;
+                for (User u : users) {
+                    if (bill.getFriends().get(j).equalsIgnoreCase(u.getName())) {
+                        u.setExpense(u.getExpense() + expenditure);
+                    }
                 }
-            }
+            }  
         }
         // Calculate balance for all users after expenses calculated
         for (User u : users) {
@@ -118,7 +145,7 @@ public class SplitService {
          * for each payer, pay their remaining balance to the payee
          * new Transaction(tId, billId, payer n, payee, payer n's balance)
          */
-        /* case 2: if there are more than one payee
+        /* case 2: if there are more than one payees
          * if payer 0 balance + payee 0 balance < 0, 
          * payer 0 pays balance to payee 0, set new balance for payee
          * new Transaction(tId, billId, payer n, payee 0, payer n's balance)
@@ -171,31 +198,14 @@ public class SplitService {
             transRepo.insertTransaction(t);
             rowsInserted++;
         }
-        System.out.println(">>>> Service: Transactions added = " + rowsInserted);
-        System.out.println(">>>> Service: Transactions " + transactions);
+        System.out.println(">>>> Service: " + rowsInserted + 
+                " Transactions added: " + transactions);
         billRepo.insertBill(bill);
         if (rowsInserted == transactions.size()) {
             return bill.getBillId();
         }
         return null;
     }
-
-    // private String saveBill(Bill bill) {
-    //     bill.setBillID(generateUUID());
-    //     billRepo.insertBill(bill);
-    //     return bill.getBillId();
-    // }
-
-    // private int saveTransactions(List<Transaction> transactions) {
-    //     int rowsInserted = 0;
-    //     for (Transaction t : transactions) {
-    //         transRepo.insertTransaction(t);
-    //         rowsInserted++;
-    //     }
-    //     System.out.println(">>>> Service: Transactions added = " + rowsInserted);
-    //     System.out.println(">>>> Service: Transactions " + transactions);
-    //     return rowsInserted;
-    // }
 
     // generate 8 char UUID
     private String generateUUID() { 

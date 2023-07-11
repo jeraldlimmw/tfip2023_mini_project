@@ -1,8 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UploadService } from '../upload.service';
-import { Bill, Paid } from '../models';
+import { BillService } from '../bill.service';
 
 @Component({
   selector: 'app-add-friends',
@@ -13,10 +12,11 @@ export class AddFriendsComponent implements OnInit{
 
   fb = inject(FormBuilder)
   router = inject(Router)
-  uploadSvc = inject(UploadService)
+  billSvc = inject(BillService)
   
   form!: FormGroup
   friendsArr!: FormArray
+  totalAmount = 0
 
   ngOnInit(): void {
     this.form = this.createForm()
@@ -28,7 +28,6 @@ export class AddFriendsComponent implements OnInit{
     this.friendsArr = this.fb.array([])
     return this.fb.group({
       title: this.fb.control<string>('', [ Validators.required ]),
-      total: this.fb.control<number>(0.00, [ Validators.required, Validators.min(0.01)]),
       friends: this.friendsArr
     })
   }
@@ -37,7 +36,7 @@ export class AddFriendsComponent implements OnInit{
     this.friendsArr.push(
       this.fb.group({
         name: this.fb.control<string>(!!s? s : '', 
-            [ Validators.required, Validators.minLength(2)]),
+            [ Validators.required, Validators.minLength(2), Validators.maxLength(50)]),
         amount: this.fb.control<number>(0, 
             [ Validators.required, Validators.min(0) ])
       })
@@ -49,18 +48,43 @@ export class AddFriendsComponent implements OnInit{
   }
 
   saveFriends() {
-    this.uploadSvc.bill.title = this.form.value.title
-    this.uploadSvc.bill.total = this.form.value.total
-    this.uploadSvc.bill.friends = this.friendsArr.controls.map(
+    this.billSvc.bill.title = this.form.value.title
+    this.billSvc.bill.total = this.totalAmount
+    this.billSvc.bill.friends = this.friendsArr.controls.map(
         control => control.value.name
     )
-    this.uploadSvc.bill.paid = this.friendsArr.controls
+    this.billSvc.bill.paid = this.friendsArr.controls
         .filter(control => control.value.amount > 0)
         .map(control => ({
             name: control.value.name,
             amount: control.value.amount
         }))
-    console.info(this.uploadSvc.bill)
-    this.router.navigate(['/items'])
+    console.info(this.billSvc.bill)
+    this.router.navigate(['/bill-share'])
+  }
+
+  calculateTotalAmount() {
+    this.totalAmount = 0
+    for (let i = 0; i < this.friendsArr.length; i++) {
+      this.totalAmount += this.friendsArr.at(i).get('amount')?.value
+    }
+  }
+
+  // Validations
+  lessThanThreeFriends() {
+    return this.friendsArr.length < 3
+  }
+  
+  invalidField(ctrlName: string) {
+    return !!(this.form.get(ctrlName)?.invalid && this.form.get(ctrlName)?.dirty)
+  }
+
+  invalidFriendName(i: number, name: string) {
+    return !!(this.friendsArr.at(i).get(name)?.invalid 
+        && this.friendsArr.at(i).get(name)?.dirty)
+  }
+
+  invalidForm() {
+    return this.totalAmount < 1 || this.form.invalid
   }
 }

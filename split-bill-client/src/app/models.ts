@@ -2,9 +2,8 @@ export interface Item {
     itemName: string
     price: number
     quantity: number
-    share: number[]
-    percentShare: number[]
-    // people: string[]
+    shares: number[]
+    percentShares: number[]
 }
 
 export interface Paid {
@@ -23,17 +22,28 @@ export interface Bill {
     tax: number
 }
 
+export interface ReceiptResponse {
+    receiptItems: Item[]
+    receiptTotal: number
+    taxAndServiceIncl: boolean
+}
+
+export interface BillIdResponse {
+    billId: string
+}
+
 export interface Transaction {
     transactionId: string
     payer: string
     payee: string
     amount: number
-    // paylahQR: string
 }
 
 export interface Settlement {
     billId: string
+    total: number
     title: string
     transactions: Transaction[]
+    //message: string
     timestamp: number
 }

@@ -1,6 +1,5 @@
 package backend.billbackend.repositories;
 
-import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -22,8 +21,7 @@ public class BillRepository {
         Query query = new Query();
         query.addCriteria(Criteria.where("billId").is(id));
 
-        mongoTemplate.find(query, Document.class, "bills");
-        return null;
+        return mongoTemplate.find(query, Bill.class, "bills")
+                .get(0);
     }
-
 }

@@ -7,7 +7,7 @@ public class DBQueries {
             """;
     
     public static final String SELECT_TRANSACTIONS_BY_BILL_ID = """
-            select id, billId, payer, payee, amount
+            select *
             from transactions
             where billId like ?
             """;

@@ -6,7 +6,6 @@ public class Transaction {
     private String payer;
     private String payee;
     private Double amount;
-    private String paylahQR;
 
     public Transaction() {
     }
@@ -17,7 +16,6 @@ public class Transaction {
         this.payer = payer;
         this.payee = payee;
         this.amount = amount;
-        //this.paylahQR = "";
     }
 
     public String getId() {

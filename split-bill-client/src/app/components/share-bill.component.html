@@ -1,0 +1,113 @@
+<div>
+    <h1>
+        Add items to bill
+    </h1>
+</div>
+<div>
+    <table>
+        <tr>
+            <td>Bill Title: </td>
+            <td>{{ currentBill.title }}</td>
+        </tr>
+        <tr>
+            <td>Total Expenditure: </td>
+            <td>$ {{ currentBill.total }}</td>
+        </tr>
+    </table>
+    <hr>
+    <table>
+        <tr>
+            <td><button type="button" [disabled]="!this.currentBill.byPercentage">
+                    By Shares</button></td>
+            <td><button (click)="splitByPercent()">By %</button></td>
+        </tr>
+    </table>
+    <br>
+    <button type="button" (click)="addReceipt()">
+        Take Photo of Receipt
+    </button>
+    <br>
+    <br>
+    <form [formGroup]="form" (submit)="saveBill()">
+        <table>
+            <thead>
+                <tr>
+                    <td>No.</td>
+                    <td>Item</td>
+                    <td>Price</td>
+                    <td>Quantity</td>
+                    <td></td>
+                    <td *ngFor="let f of currentBill.friends">{{ f }}</td>
+                </tr>
+            </thead>
+            <tbody formArrayName="items">
+                <tr *ngFor="let item of itemArr.controls; let i = index" [formGroupName]="i">
+                    <td>
+                        {{ (i + 1) }}
+                    <td>
+                        <input type="text" size="30" formControlName="itemName">
+                    </td>
+                    <td>
+                        $ <input type="number" formControlName="price" 
+                                (input)="calculateTotalPrice()">
+                    </td>
+                    <td>
+                        x <input type="number" formControlName="quantity" 
+                                (input)="calculateTotalPrice()">
+                    </td>
+                    <td>
+                        <button type="button" (click)="equalShare(i)">
+                                Equal Shares</button>
+                    </td>
+                    <td *ngFor="let f of currentBill.friends; let j = index">
+                        <input type="number" formControlName="share{{ j }}">
+                    </td>
+                    <td>
+                        <button type="button" (click)="removeItem(i)" 
+                                [disabled]="oneItemLeft()">X</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <button type="button" (click)="addItem(null)">Add Item</button>
+        <ul *ngFor="let item of itemArr.controls; let i = index">
+            <li *ngIf="noShares(i)">Item {{ (i + 1) }}'s total shares is 0</li>
+        </ul>
+        <br>
+        <table>
+            <tr>
+                <td>Service: </td>
+                <td>
+                    <input type="number" formControlName="service" 
+                            (input)="calculateTotalPrice()">%
+                </td>
+                <td>
+                    <button type="button" (click)="exclude('service')"
+                            (click)="calculateTotalPrice()">Remove</button>
+                </td>
+            </tr>
+            <tr>
+                <td>Tax (GST): </td>
+                <td>
+                    <input type="number" formControlName="tax" 
+                            (input)="calculateTotalPrice()">%
+                </td>
+                <td>
+                    <button type="button" (click)="exclude('tax')" 
+                            (click)="calculateTotalPrice()">Remove</button>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table>
+            <tr>
+                <td>Calculated Total: </td>
+                <td>$ {{ totalPrice }}</td>
+            </tr>
+        </table>
+        <br>
+        <button type="submit" [disabled]="invalidForm()">Split bill</button>
+        <button type="button">Back</button>
+    </form>
+</div>
