@@ -1,6 +1,8 @@
 package backend.billbackend.models;
 
-public class Transaction {
+import java.io.Serializable;
+
+public class Transaction implements Serializable{
     private String id;
     private String billId;
     private String payer;

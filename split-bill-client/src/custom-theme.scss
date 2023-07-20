@@ -1,0 +1,86 @@
+
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@use '@angular/material' as mat;
+// Plus imports for other components in your app.
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat.core();
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+$billbuddy-dark: (
+ 50: #e4f2f1,
+ 100: #bde0dc,
+ 200: #96cdc6,
+ 300: #74b8af,
+ 400: #61a89e,
+ 500: #58998e,
+ 600: #528b81,
+ 700: #4b7b71,
+ 800: #466b63,
+ 900: #3b4e48,
+ contrast: (
+   50: rgba(black, 0.87),
+   100: rgba(black, 0.87),
+   200: rgba(black, 0.87),
+   300: rgba(black, 0.87),
+   400: white,
+   500: white,
+   600: white,
+   700: white,
+   800: white,
+   900: white
+ )
+);
+
+$billbuddy-light: (
+ 50: #e6f0e9,
+ 100: #c3daca,
+ 200: #9ec1a8,
+ 300: #7aab89,
+ 400: #629b73,
+ 500: #438c5a,
+ 600: #3c7f51,
+ 700: #346e45,
+ 800: #2c5e3a,
+ 900: #1d4027,
+ contrast: (
+   50: rgba(black, 0.87),
+   100: rgba(black, 0.87),
+   200: rgba(black, 0.87),
+   300: rgba(black, 0.87),
+   400: rgba(black, 0.87),
+   500: white,
+   600: white,
+   700: white,
+   800: white,
+   900: white
+ )
+);
+
+$split-bill-client-primary: mat.define-palette($billbuddy-dark, 700, 300, 900);
+$split-bill-client-accent: mat.define-palette($billbuddy-light, 300);
+
+// The warn palette is optional (defaults to red).
+$split-bill-client-warn: mat.define-palette(mat.$red-palette);
+
+// Create the theme object. A theme consists of configurations for individual
+// theming systems such as "color" or "typography".
+$split-bill-client-theme: mat.define-light-theme((
+  color: (
+    primary: $split-bill-client-primary,
+    accent: $split-bill-client-accent,
+    warn: $split-bill-client-warn,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include mat.all-component-themes($split-bill-client-theme);

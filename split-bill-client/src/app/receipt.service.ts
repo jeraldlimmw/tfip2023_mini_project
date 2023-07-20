@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import { ReceiptResponse } from "./models";
+import { ReceiptItems } from "./models";
 
 @Injectable()
 export class ReceiptService {
@@ -8,9 +8,6 @@ export class ReceiptService {
     photo = '';
 
     postReceipt(dataUrl: String) {
-        // const formData = new FormData()
-        // formData.set('file', file) // @RequestPart MultipartFile myFile
-        
-        return this.http.post<ReceiptResponse>('/receipt/upload', dataUrl)
+        return this.http.post<ReceiptItems>('/receipt/upload', dataUrl)
     }
 }

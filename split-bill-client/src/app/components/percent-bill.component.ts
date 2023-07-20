@@ -8,133 +8,100 @@ import { BillService } from '../bill.service';
 @Component({
   selector: 'app-percent-bill',
   templateUrl: './percent-bill.component.html',
-  styleUrls: ['./percent-bill.component.css']
+  styleUrls: ['./percent-bill.component.scss']
 })
 export class PercentBillComponent {
+
+  links = ['Step 1: Add Friends & Expenditure', 'Step 2: Add Items', 'Step 3: Split Bill']
+  activeLink = this.links[2];
+  // splitBy = ['share', 'percent']
+  // activeSplitBy = this.splitBy[1]
 
   fb = inject(FormBuilder)
   router = inject(Router)
   billSvc = inject(BillService)
 
   form!: FormGroup
-  itemArr!: FormArray
-  itemForm!: FormGroup
+  percentArr!: FormArray
+  percentForm!: FormGroup
   currentBill!: Bill
-  totalPrice = 0
 
   ngOnInit(): void {
+    this.billSvc.bill.byPercentage = true
     this.currentBill = this.billSvc.bill
-    this.currentBill.byPercentage = true
     this.form = this.createForm()
   }
 
   // Create form
   createForm() {
-    this.itemArr = this.fb.array([])
-    this.addItem('item')
+    this.percentArr = this.fb.array([])
+    this.currentBill.items.forEach(item => {
+      this.addPercentControls()
+    })
     return this.fb.group({
-      items: this.itemArr,
-      service: this.fb.control<number>(10, [ Validators.required, Validators.min(0) ]),
-      tax: this.fb.control<number>(8, [ Validators.required, Validators.min(0) ])
+      percentShares: this.percentArr
     })
   }
 
-  // Buttons
-  // add and remove item from ItemArr
-  addItem(s: string | null) {
-    this.itemForm = this.fb.group({
-      itemName: this.fb.control<string>(!!s? s : '', 
-          [ Validators.required, Validators.minLength(2) ]),
-      price: this.fb.control<number>(0, [ Validators.required, Validators.min(0.01) ]),
-      quantity: this.fb.control<number>(1, [ Validators.required, Validators.min(1) ])
-    })
-    this.addPercentShare(this.currentBill.friends.length)
-    this.itemArr.push(this.itemForm)
-  }
-  
-  addPercentShare(max: number) {
-    for(let i = 0; i < max; i++) {
-      this.itemForm.addControl(`percent${i}`, this.fb.control<number>(0, [ Validators.required, Validators.min(0) ]))
+  addPercentControls() {
+    this.percentForm = this.fb.group({})
+    for(let j = 0; j < this.currentBill.friends.length; j++) {
+      this.percentForm.addControl(`percent${j}`, this.fb.control<number>(0, [ Validators.required, Validators.min(0) ]))
     }
-  }
-
-  removeItem(i: number) {
-    this.itemArr.removeAt(i)
-  }
-
-  exclude(s: string) {
-    this.form.get(s)?.patchValue(0)
+    this.percentArr.push(this.percentForm)
   }
 
   splitByShare() {
+    this.billSvc.bill = this.currentBill
     this.router.navigate(['/bill-share'])
   }
 
   // Post bill to backend
-  createPercentArr(c: any): number[] {
-    const percentArr: number[] = []
-    for (let i = 0; i < this.currentBill.friends.length; i++) {
-      percentArr.push(c.get(`percent${i}`).value / 100)
+  getPercentSharesArr(i: number): number[] {
+    const percentShares: number[] = []
+    for (let j = 0; j < this.currentBill.friends.length; j++) {
+      percentShares.push(this.percentArr.at(i).get(`percent${j}`)?.value / 100)
     }
-    return percentArr
+    return percentShares
   }
 
   saveBill() {
-    this.currentBill.service = this.form.value.service
-    this.currentBill.tax = this.form.value.tax
-    this.currentBill.items = this.itemArr.controls
-        .map(control => ({
-          itemName: control.value.itemName,
-          price: control.value.price,
-          quantity: control.value.quantity,
-          shares: [],
-          percentShares: this.createPercentArr(control)
-      }))
+    for(let i = 0; i < this.currentBill.items.length; i++) {
+      this.currentBill.items[i].percentShares = this.getPercentSharesArr(i)
+    }
     console.info(this.currentBill)
     
     firstValueFrom(this.billSvc.postBillSplit(this.currentBill))
-      .then(result => {
-        console.info(result)
-      })
-      .catch(err => {
-        alert(JSON.stringify(err))
-      })
+    .then(response => { 
+      const billId = response.billId
+      console.info(billId)
+
+      if (this.billSvc.bill.chatId != -1) {
+        firstValueFrom(this.billSvc.telegramBill(billId))
+          .then(result => {})
+          .catch(error => {})
+      }
+      this.router.navigate(['/settle', billId])
+    })
+    .catch(err => {
+      alert(JSON.stringify(err))
+    })
   }
 
   // Validations
-  calculateTotalPrice() {
-    this.totalPrice = 0
-    for (let i = 0; i < this.itemArr.length; i++) {
-      const quantity = this.itemArr.at(i).get('quantity')?.value
-      const price = this.itemArr.at(i).get('price')?.value
-      this.totalPrice += (quantity * price)
-    }
-    this.totalPrice = this.totalPrice * (1 + this.form.get('service')?.value/100) 
-                        * (1 + this.form.get('tax')?.value/100)
-  }
-
-  oneItemLeft() {
-    return this.itemArr.length < 2
-  }
-  
   not100Percent(i: number) {
     let totalPercentage = 0
     for (let j = 0; j < this.currentBill.friends.length; j++) {
-      totalPercentage += this.itemArr.at(i).get(`percent${j}`)?.value
+      totalPercentage += this.percentArr.at(i).get(`percent${j}`)?.value
     }
-    return totalPercentage != 100 && this.itemArr.at(i).dirty
-  }
-
-  incorrectTotal() {
-    return this.totalPrice < (this.currentBill.total - 0.01) || 
-        this.totalPrice > (this.currentBill.total + 0.01)
+    return totalPercentage != 100
   }
 
   invalidForm() {
     let rowsWithout100Percent = 0
-    for (let i = 0; i < this.itemArr.length; i++) {
+    for (let i = 0; i < this.percentArr.length; i++) {
       if (this.not100Percent(i)) rowsWithout100Percent++
     }
-    return this.form.invalid || this.incorrectTotal() || rowsWithout100Percent > 0
+    return this.form.invalid || rowsWithout100Percent > 0
   }
 }

@@ -1,13 +1,22 @@
 <div>
-    <h1>Create New Bill</h1>
+    <nav mat-tab-nav-bar backgroundColor="primary" [tabPanel]="tabPanel">
+        <a mat-tab-link (click)="activeLink = links[0]"
+           [active]="activeLink == links[0]">{{ links[0] }}</a>
+        <a mat-tab-link disabled>{{ links[1] }}</a>
+        <a mat-tab-link disabled>{{ links[2] }}</a>
+      </nav>
+      <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
 </div>
+<br>
 <div>
     <form [formGroup]="form" (submit)="saveFriends()">
+        
         <table>
             <tr>
-                <td>Bill Title: </td>
-                <td>
-                    <input type="text" size="30" formControlName="title">
+                <th style="text-align: right;">Bill Title:</th>
+                <td colspan="3">
+                        &nbsp;<input type="text" size="35" formControlName="title"
+                        placeholder="Give your bill a title">
                 </td>
                 <td>
                     <span *ngIf="invalidField('title')">
@@ -16,12 +25,16 @@
                 </td>
             </tr>
             <tr>
-                <td>Total Expenditure: </td>
+                <th style="text-align: right;">Total Paid:</th>
+                <td style="vertical-align: middle; text-align: right; width: 30px;">
+                    <mat-icon svgIcon="dollar"></mat-icon> 
+                </td>
+                <td style="text-align: left">
+                    {{ totalAmount.toFixed(2) }}
+                </td>
                 <td>
-                    $ {{ totalAmount }}
-                    <!-- <input type="number" formControlName="total"> -->
                     <span *ngIf="totalAmount < 1">
-                        (Total expenditure must be more than $1.00)
+                        (must be more than $1.00)
                     </span>
                 </td>
             </tr>
@@ -30,21 +43,29 @@
         <table>
             <thead>
                 <tr>
-                    <td>Friends:</td>
-                    <td>Amount Paid:</td>
+                    <th>Friends:</th>
+                    <th colspan="2" style="text-align: right;">Amount Paid:</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody formArrayName="friends">
                 <tr *ngFor="let f of friendsArr.controls; let i = index" [formGroupName]="i">
-                    <td>
-                        <input type="text" size="30" formControlName="name">
+                    <td style="vertical-align: middle;">
+                        <input type="text" size="25" formControlName="name">
                     </td>
-                    <td>
-                        $<input type="number" formControlName="amount" (input)="calculateTotalAmount()">
+                    <td style="vertical-align: middle; width:30px; text-align: right;">
+                        <mat-icon svgIcon="dollar"></mat-icon>
                     </td>
-                    <td>
-                        <button type="button" (click)="removeFriend(i)"
-                                [disabled]="lessThanThreeFriends()">X</button>
+                    <td style="vertical-align: middle;">
+                        <input type="number" style="width: 70px;" formControlName="amount" 
+                        (input)="calculateTotalAmount()">
+                    </td>
+                    <td style="vertical-align: middle;">
+                        <button mat-icon-button type="button" 
+                                (click)="removeFriend(i)"
+                                [disabled]="lessThanThreeFriends()">
+                            <mat-icon svgIcon="bin"></mat-icon>
+                        </button>
                     </td>
                     <td>
                         <span *ngIf="invalidFriendName(i, 'name')">
@@ -54,14 +75,18 @@
                 </tr>
                 <tr>
                     <td>
-                        <button type="button" (click)="addFriend(null)">
-                            add another friend
+                        <button mat-flat-button class="orange-btn dense-2" type="button" (click)="addFriend(null, 0)">
+                            Add another friend
                         </button>
                     </td>
                 </tr>
+                    <br>
+                <tr>
+                    <td>
+                        <button mat-flat-button class="pill" color="accent" type="submit" [disabled]="invalidForm()">Next: Add items</button>
+                    </td>
+                </tr>
             </tbody>
-        </table>
-        <br>
-        <button type="submit" [disabled]="invalidForm()">Next: Add items</button>
+        </table>        
     </form>
 </div>

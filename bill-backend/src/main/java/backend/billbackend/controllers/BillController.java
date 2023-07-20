@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,13 +21,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import backend.billbackend.models.Bill;
 import backend.billbackend.models.Settlement;
+import backend.billbackend.services.BillEmailService;
 import backend.billbackend.services.SplitService;
+import backend.billbackend.services.TelegramService;
+import jakarta.mail.MessagingException;
 
 @Controller
 @RequestMapping(path="/bill")
 public class BillController {
     @Autowired
     private SplitService splitSvc;
+
+    @Autowired
+    private BillEmailService emailSvc;
+
+    @Autowired
+    private TelegramService teleSvc;
 
     // Post method to get Bill object
     @PostMapping(path="/store")
@@ -51,9 +61,9 @@ public class BillController {
     }
 
     // Get Settlement with array of transactions based on bill
-    @GetMapping(path="/settlement/{id}")
+    @GetMapping(path="/settlement")
     @ResponseBody
-    public ResponseEntity<String> getSettlementFromBillId(@PathVariable String id) {
+    public ResponseEntity<String> getSettlementFromBillId(@RequestParam String id) {
         Settlement settlement = splitSvc.getSettlement(id);
         
         if (Objects.isNull(settlement)) {
@@ -71,5 +81,34 @@ public class BillController {
         }
         return ResponseEntity.ok()
                     .body(settlementJson);
+    }
+
+    @PostMapping(path="email/{id}")
+    @ResponseBody
+    public ResponseEntity<String> sendEmailByBillId(@PathVariable String id, @RequestBody String recipient) {
+        System.out.println(">>>> Controller: bill id = " +  id);
+        System.out.println(">>>> Controller: recipient = " + recipient);
+        
+        try {
+            emailSvc.sendBill(id, recipient);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok("{\"message\": \"email sent\"}");
+    }
+
+    @PostMapping(path="telegram")
+    @ResponseBody
+    public ResponseEntity<String> sendSettlementToTelegram(@RequestBody String id) {
+        try {
+            teleSvc.sendSettlement(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok("{\"message\": \"telegram sent\"}");
     }
 }

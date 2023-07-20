@@ -1,16 +1,21 @@
 <div>
-    <img [src]="photo" width="400">
+    <nav mat-tab-nav-bar backgroundColor="primary" [tabPanel]="tabPanel">
+        <a mat-tab-link disabled> {{ links[0] }} </a>
+        <a mat-tab-link (click)="activeLink = links[1]"
+           [active]="activeLink == links[1]"> {{ links[1] }} </a>
+        <a mat-tab-link disabled>{{ links[2] }}</a>      
+    </nav>
+    <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
 </div>
 <br>
 <div>
-    <table>
-        <tr>
-            <td>
-                <button type="button" [routerLink]="[ '/receipt' ]">Back</button>
-            </td> 
-            <td>
-                <button type="button" (click)="upload()">Upload</button>
-            </td> 
-            </tr>
-    </table>
+    <button mat-flat-button class="red-btn" type="button" 
+    [routerLink]="[ '/receipt' ]">Back</button>
+</div>
+<br>
+<div align="center">
+    <img [src]="photo" width="480">
+<br>
+<br>
+    <button mat-flat-button class="yellow-btn" type="button" (click)="upload()">Upload</button>
 </div>

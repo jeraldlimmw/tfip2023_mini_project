@@ -2,13 +2,17 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BillService } from '../bill.service';
+import { Bill } from '../models';
 
 @Component({
   selector: 'app-add-friends',
   templateUrl: './add-friends.component.html',
-  styleUrls: ['./add-friends.component.css']
+  styleUrls: ['./add-friends.component.scss']
 })
 export class AddFriendsComponent implements OnInit{
+
+  links = ['Step 1: Add Friends & Expenditure', 'Step 2: Add Items', 'Step 3: Split Bill']
+  activeLink = this.links[0];
 
   fb = inject(FormBuilder)
   router = inject(Router)
@@ -16,28 +20,44 @@ export class AddFriendsComponent implements OnInit{
   
   form!: FormGroup
   friendsArr!: FormArray
+  currentBill!: Bill
   totalAmount = 0
 
   ngOnInit(): void {
+    this.currentBill = this.billSvc.bill
     this.form = this.createForm()
-    this.addFriend('me')
-    this.addFriend('friend1')
+
+    if (this.currentBill.friends.length > 0) {
+      this.currentBill.friends.forEach(f => {
+        let amountPaid = 0
+        this.currentBill.paid.forEach(p => {
+          if (p.name === f) amountPaid = p.amount
+        }); 
+        this.addFriend(f, amountPaid)
+      });
+      this.totalAmount = this.currentBill.total
+    } else {
+      const name = (!!this.currentBill.user.firstName) ? 
+          this.currentBill.user.firstName : "me"
+      this.addFriend(name, 0)
+      this.addFriend('friend1', 0)
+    }
   }
 
   createForm() {
     this.friendsArr = this.fb.array([])
     return this.fb.group({
-      title: this.fb.control<string>('', [ Validators.required ]),
+      title: this.fb.control<string>(!!this.currentBill.title? this.currentBill.title : '', [ Validators.required ]),
       friends: this.friendsArr
     })
   }
 
-  addFriend(s: string | null) {
+  addFriend(s: string | null, a: number | null) {
     this.friendsArr.push(
       this.fb.group({
         name: this.fb.control<string>(!!s? s : '', 
             [ Validators.required, Validators.minLength(2), Validators.maxLength(50)]),
-        amount: this.fb.control<number>(0, 
+        amount: this.fb.control<number>(!!a? a: 0, 
             [ Validators.required, Validators.min(0) ])
       })
     )
@@ -60,7 +80,7 @@ export class AddFriendsComponent implements OnInit{
             amount: control.value.amount
         }))
     console.info(this.billSvc.bill)
-    this.router.navigate(['/bill-share'])
+    this.router.navigate(['/items'])
   }
 
   calculateTotalAmount() {

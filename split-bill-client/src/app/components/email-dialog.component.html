@@ -1,0 +1,11 @@
+<h1 mat-dialog-title>Send full bill via email</h1>
+<div mat-dialog-content>
+  <mat-form-field [formGroup]="form">
+    <mat-label>Email address</mat-label>
+    <input matInput placeholder="Your email address" formControlName="email">
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-raised-button color="basic" (click)="close()">Close</button>
+  <button mat-raised-button color="primary" (click)="saveEmail()">Send email</button>
+</div>

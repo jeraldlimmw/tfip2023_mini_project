@@ -1,0 +1,29 @@
+@use "@angular/material" as mat;
+@include mat.core();
+
+.mat-mdc-unelevated-button.orange-btn {
+    background-color: #fdb133;
+    border-radius: 20px;
+}
+
+.mat-mdc-unelevated-button.red-btn {
+    background-color: #ff6241;
+    border-radius: 20px;
+}
+
+.mat-mdc-unelevated-button.yellow-btn {
+    background-color: #ffd600;
+    border-radius: 20px;
+}
+
+.mat-mdc-unelevated-button.pill {
+    border-radius: 20px;
+}
+
+.yellow-fab {
+    background-color: #ffd600;
+}
+
+.center {
+    justify-content: center;
+}

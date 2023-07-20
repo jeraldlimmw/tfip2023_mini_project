@@ -1,15 +1,15 @@
 package backend.billbackend.models;
 
+import java.io.Serializable;
 import java.util.List;
 
 import jakarta.json.JsonObject;
 
-
-public class Item {
+public class Item implements Serializable{
     private String itemName;
     private Double price;
     private Integer quantity;
-    private List<Integer> shares;
+    private List<Double> shares;
     private List<Double> percentShares;
     
     public String getItemName() {
@@ -30,10 +30,10 @@ public class Item {
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
-    public List<Integer> getShares() {
+    public List<Double> getShares() {
         return shares;
     }
-    public void setShares(List<Integer> shares) {
+    public void setShares(List<Double> shares) {
         this.shares = shares;
     }
     public List<Double> getPercentShares() {

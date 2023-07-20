@@ -1,40 +1,33 @@
 package backend.billbackend.models;
 
-public class User {
-    private String name;
-    private Double balance;
-    private Double expense;
+import java.io.Serializable;
 
-    public User() {
+public class User implements Serializable{
+    private Long userId;
+    private String username;
+    private String firstName;
+    
+    public Long getUserId() {
+        return userId;
     }
-
-    public User(String name, Double balance) {
-        this.name = name;
-        this.balance = balance;
-        this.expense = 0.0;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
-
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
-    public Double getBalance() {
-        return balance;
+    public String getFirstName() {
+        return firstName;
     }
-    public void setBalance(Double balance) {
-        this.balance = balance;
-    }
-    public Double getExpense() {
-        return expense;
-    }
-    public void setExpense(Double expense) {
-        this.expense = expense;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
     
     @Override
     public String toString() {
-        return "User [name=" + name + ", balance=" + balance + ", expense=" + expense + "]";
+        return "User [userId=" + userId + ", username=" + username + ", firstName=" + firstName + "]";
     }
 }

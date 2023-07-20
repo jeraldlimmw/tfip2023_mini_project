@@ -17,7 +17,7 @@ import backend.billbackend.models.Item;
 import backend.billbackend.models.Paid;
 import backend.billbackend.models.Settlement;
 import backend.billbackend.models.Transaction;
-import backend.billbackend.models.User;
+import backend.billbackend.models.Participant;
 import backend.billbackend.repositories.BillRepository;
 import backend.billbackend.repositories.TransactionRepository;
 
@@ -30,14 +30,22 @@ public class SplitService {
     @Autowired
     private TransactionRepository transRepo;
 
-    private List<User> payees = new LinkedList<>();
-    private List<User> payers = new LinkedList<>();
-    private List<User> users = new LinkedList<>();
-    private List<Transaction> transactions = new LinkedList<>();
+    @Autowired
+    private SettlementMessageService msgSvc;
+
+    private List<Participant> payees;
+    private List<Participant> payers;
+    private List<Participant> participants;
+    private List<Transaction> transactions;
 
     public String split(Bill bill) {
         // TODO: add transactional, and put SQL in front of Mongo so that it can rollback
         // Store Bill in Mongo
+        payees = new LinkedList<>();
+        payers = new LinkedList<>();
+        participants = new LinkedList<>();
+        transactions = new LinkedList<>();
+        
         bill.setBillID(generateUUID());
         bill.setTimestamp(DateTime.now().getMillis());
 
@@ -45,17 +53,17 @@ public class SplitService {
 
         // Add people to Users list - people who paid will have -ve balance
         for (Paid p : bill.getPaid()) {
-            users.add(new User(p.getName(), (0.0 - p.getAmount())));
+            participants.add(new Participant(p.getName(), (0.0 - p.getAmount())));
             payeeNames.add(p.getName());
         }
-        System.out.println(">>>> Service: Users (Ppl who paid)" + users);
+        System.out.println(">>>> Service: Participants (Ppl who paid)" + participants);
 
         for (String f : bill.getFriends()) {
             if (!payeeNames.contains(f)) {
-                users.add(new User(f, 0.0));
+                participants.add(new Participant(f, 0.0));
             }
         }
-        System.out.println(">>>> Service: Users (Add in everyone else)" + users);
+        System.out.println(">>>> Service: Participants (Add in everyone else)" + participants);
 
         // Add expenses to each User
         addExpenses(bill);
@@ -79,6 +87,7 @@ public class SplitService {
         s.setTotal(b.getTotal());
         s.setTimestamp(b.getTimestamp());
         s.setTransactions(transRepo.findTransactionsByBillId(id));
+        s.setMessage(msgSvc.constructSettlementMessage(b));
         System.out.println(">>>> Service: Settlement " + s);
         return s;
     }
@@ -89,12 +98,12 @@ public class SplitService {
             for (Item i : bill.getItems()) {
                 // calculate total shares
                 double totalShares = 0.0;
-                for (int s : i.getShares()) {
+                for (double s : i.getShares()) {
                     totalShares += s;
                 }
                 // create and set percentShares list
                 List<Double> ps = new ArrayList<>();
-                for (int s : i.getShares()) {
+                for (double s : i.getShares()) {
                     double p = (s > 0) ? (s/totalShares) : 0.0;
                     ps.add(p);
                 }
@@ -109,22 +118,22 @@ public class SplitService {
                             * (1.0 + bill.getTax()/100));
             for (int j = 0; j < bill.getFriends().size(); j++) {
                 double expenditure = i.getPercentShares().get(j) * finalPrice;
-                for (User u : users) {
-                    if (bill.getFriends().get(j).equalsIgnoreCase(u.getName())) {
-                        u.setExpense(u.getExpense() + expenditure);
+                for (Participant p : participants) {
+                    if (bill.getFriends().get(j).equalsIgnoreCase(p.getName())) {
+                        p.setExpense(p.getExpense() + expenditure);
                     }
                 }
             }  
         }
         // Calculate balance for all users after expenses calculated
-        for (User u : users) {
-            u.setBalance(u.getBalance() + u.getExpense());
+        for (Participant p : participants) {
+            p.setBalance(p.getBalance() + p.getExpense());
         }
-        System.out.println(">>>> Service: Users " + users);
+        System.out.println(">>>> Service: Participants " + participants);
     }
 
     private void sortPayees() {
-        payees = users.stream()
+        payees = participants.stream()
                 .filter(u -> u.getBalance() < 0)
                 .sorted((u1, u2) -> u1.getBalance().compareTo(u2.getBalance()))
                 .collect(Collectors.toList());
@@ -132,7 +141,7 @@ public class SplitService {
     }
 
     private void sortPayers() {
-        payers = users.stream()
+        payers = participants.stream()
                 .filter(u -> u.getBalance() >= 0)
                 .sorted((u1, u2) -> u2.getExpense().compareTo(u1.getExpense()))
                 .collect(Collectors.toList());
@@ -159,7 +168,7 @@ public class SplitService {
          */
         while (!payees.isEmpty()) {
             if (payees.size() == 1) {
-                for (User p : payers) {
+                for (Participant p : payers) {
                     transactions.add(new Transaction("t" + generateUUID(), billId, 
                             p.getName(), payees.get(0).getName(),
                             p.getBalance()));
@@ -171,7 +180,7 @@ public class SplitService {
                     transactions.add(new Transaction("t" + generateUUID(), billId, 
                             payers.get(0).getName(), payees.get(0).getName(),
                             payers.get(0).getBalance()));
-                    User toUpdatePayee = payees.get(0);
+                    Participant toUpdatePayee = payees.get(0);
                     toUpdatePayee.setBalance(
                             payees.get(0).getBalance() 
                             + payers.get(0).getBalance());
@@ -181,7 +190,7 @@ public class SplitService {
                     transactions.add(new Transaction("t" + generateUUID(), billId, 
                             payers.get(0).getName(), payees.get(0).getName(),
                             -1.0 * payees.get(0).getBalance()));
-                    User toUpdatePayer = payers.get(0);
+                    Participant toUpdatePayer = payers.get(0);
                     toUpdatePayer.setBalance(payees.get(0).getBalance() 
                             + payers.get(0).getBalance());
                     payees.remove(0);

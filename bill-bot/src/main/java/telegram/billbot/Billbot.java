@@ -14,9 +14,12 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import jakarta.annotation.PreDestroy;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import telegram.billbot.inlinemarkups.InlineMarkup;
+import telegram.billbot.models.User;
+
 import static telegram.billbot.constants.Information.*;
 
 @Component
@@ -47,18 +50,21 @@ public class Billbot extends TelegramLongPollingBot{
 			System.out.println(text);
 			long chatId = update.getMessage().getChatId();
             System.out.println(chatId);
-			String firstname = update.getMessage().getFrom().getFirstName();
-			String username = update.getMessage().getFrom().getUserName();
-			Long userId = update.getMessage().getFrom().getId();
+			User user = new User();
+			user.setFirstName(update.getMessage().getFrom().getFirstName());
+			user.setUsername(update.getMessage().getFrom().getUserName());
+			user.setUserId(update.getMessage().getFrom().getId());
 
 			SendMessage message = new SendMessage();
 
 			switch (text) {
-				case "/start" -> message = startCmd(chatId);
-				
-				case "/help" -> message = helpCmd(chatId);
+				case "/start" -> message = onStartCmd(chatId, user);
 
-				default -> message = unknownCmd(chatId);
+				case "/start@billbuddy_bot" -> message = onStartCmd(chatId, user);
+				
+				case "/help" -> message = onHelpCmd(chatId);
+
+				default -> message = onUnknownCmd(chatId);
 			}
 
 			try{
@@ -66,23 +72,25 @@ public class Billbot extends TelegramLongPollingBot{
 			} catch (TelegramApiException e) {
 				e.printStackTrace();
 			}
-		} else if (update.hasCallbackQuery()) {
+		} 
+		/* 
+		else if (update.hasCallbackQuery()) {
 			CallbackQuery callback = update.getCallbackQuery();
 			String data = callback.getData();
 			Long chatId = callback.getMessage().getChatId();
 
 			switch (data) {
 				case "Split bill":
-					String firstname = callback.getFrom().getFirstName();
-					String username = callback.getFrom().getUserName();
-					Long userId = callback.getFrom().getId();
+					// String firstName = callback.getFrom().getFirstName();
+					// String username = callback.getFrom().getUserName();
+					// Long userId = callback.getFrom().getId();
 
-					redirectToWebpage(chatId, firstname, username, userId);
+					// redirectToWebpage(chatId, firstname, username, userId);
 					break;
-				case "paid":
+				// case "paid":
 					
-                    pmToCreator(userId);
-                    break;
+                //     pmToCreator(userId);
+                //     break;
 				default:
 					;
 			}
@@ -96,25 +104,26 @@ public class Billbot extends TelegramLongPollingBot{
 				e.printStackTrace();
 			}
 		}
+		*/
     }
 
-	private SendMessage startCmd(Long chatId) {
+	private SendMessage onStartCmd(Long chatId, User user) {
         SendMessage message = new SendMessage();
 		message.setChatId(chatId);
 		message.setText(START_MESSAGE);
         InlineMarkup im = new InlineMarkup();
-		message.setReplyMarkup(im.createStartMenu());
+		message.setReplyMarkup(im.createSplitButton(chatId, user));
 		return message;
     }
 
-	private SendMessage helpCmd(Long chatId) {
+	private SendMessage onHelpCmd(Long chatId) {
         SendMessage message = new SendMessage();
 		message.setChatId(chatId);
         message.setText(HELP_INFO);
 		return message;
     }
 
-    private SendMessage unknownCmd(Long chatId) {
+    private SendMessage onUnknownCmd(Long chatId) {
 		SendMessage message = new SendMessage();
 		message.setChatId(chatId);
         message.setText(
@@ -123,6 +132,7 @@ public class Billbot extends TelegramLongPollingBot{
 		return message;    
 	}
 
+	/*
     private void payCmd() {
 
     }
@@ -148,5 +158,11 @@ public class Billbot extends TelegramLongPollingBot{
 		ResponseEntity<String> response = template.exchange(request, String.class);
 
 		System.out.println(response.getBody());
+	}
+	*/
+
+	@PreDestroy
+	public void destroy() {
+		
 	}
 }

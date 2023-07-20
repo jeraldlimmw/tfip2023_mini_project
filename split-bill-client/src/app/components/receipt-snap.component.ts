@@ -7,9 +7,12 @@ import { ReceiptService } from '../receipt.service';
 @Component({
   selector: 'app-receipt-snap',
   templateUrl: './receipt-snap.component.html',
-  styleUrls: ['./receipt-snap.component.css']
+  styleUrls: ['./receipt-snap.component.scss']
 })
 export class ReceiptSnapComponent {
+  links = ['Step 1: Add Friends & Expenditure', 'Step 2: Add Items', 'Step 3: Split Bill']
+  activeLink = this.links[1];
+  
   router = inject(Router)
   receiptSvc = inject(ReceiptService)
 
@@ -19,8 +22,9 @@ export class ReceiptSnapComponent {
   viewHeight = 0
 
   ngOnInit(): void {
-    this.viewWidth = window.innerWidth * 0.5
-    this.viewHeight = window.innerHeight * 0.5
+    this.viewWidth = 480
+    //window.innerWidth * 1
+    this.viewHeight = window.innerHeight * 0.8
   }
 
   image(image: WebcamImage) {

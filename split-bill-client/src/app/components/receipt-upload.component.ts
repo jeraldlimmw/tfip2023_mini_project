@@ -7,9 +7,12 @@ import { BillService } from '../bill.service';
 @Component({
   selector: 'app-receipt-upload',
   templateUrl: './receipt-upload.component.html',
-  styleUrls: ['./receipt-upload.component.css']
+  styleUrls: ['./receipt-upload.component.scss']
 })
 export class ReceiptUploadComponent implements OnInit{
+  links = ['Step 1: Add Friends & Expenditure', 'Step 2: Add Items', 'Step 3: Split Bill']
+  activeLink = this.links[1];
+  
   router = inject(Router)
   billSvc = inject(BillService)
   receiptSvc = inject (ReceiptService)
@@ -18,44 +21,22 @@ export class ReceiptUploadComponent implements OnInit{
   ngOnInit(): void {
     // If there is no photo, return to snap component
     if(!this.receiptSvc.photo) {
-      this.router.navigate(['/'])
+      this.router.navigate(['/receipt'])
     }
     // retrieve photo from service
     this.photo = this.receiptSvc.photo
   }
 
   upload() {
-    //var file = this.dataURLtoFile(this.photo, new Date().toString() + '.jpeg');
-    // var file = this.dataURLtoFile(this.photo, 'receipt.jpeg');
-    // console.info('>>> file: ', file)
-
-    //firstValueFrom(this.receiptSvc.postReceipt(file))
     firstValueFrom(this.receiptSvc.postReceipt(this.photo))
       .then(result => {
         this.billSvc.bill.items = result.receiptItems
-        if (result.taxAndServiceIncl) {
-          this.billSvc.bill.tax = 0
-          this.billSvc.bill.service = 0
-        }
-        alert('posted')
+        //alert('posted')
         this.router.navigate([ '/bill-share' ])
       })
       .catch(err => {
         alert(JSON.stringify(err))
+        this.router.navigate([ '/items' ])
       })
-  }
-
-  dataURLtoFile(dataurl: string, filename: string) {
-    const regex = new RegExp(':(.*?);')
-    
-    var arr = dataurl.split(','),
-        mime = arr[0].match(regex)![1],
-        bstr = atob(arr[arr.length - 1]), 
-        n = bstr.length, 
-        u8arr = new Uint8Array(n);
-    while(n--){
-        u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, {type:mime});
   }
 }

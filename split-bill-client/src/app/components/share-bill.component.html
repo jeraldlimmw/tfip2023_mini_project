@@ -1,113 +1,57 @@
 <div>
-    <h1>
-        Add items to bill
-    </h1>
+    <nav mat-tab-nav-bar backgroundColor="primary" [tabPanel]="tabPanel">
+        <a mat-tab-link (click)="activeLink = links[0]" [routerLink]="['/']"
+           [active]="activeLink == links[0]"> {{ links[0] }} </a>
+        <a mat-tab-link (click)="activeLink = links[1]" [routerLink]="['/items']"
+           [active]="activeLink == links[1]"> {{ links[1] }} </a>
+        <a mat-tab-link (click)="activeLink = links[2]"
+           [active]="activeLink == links[2]"> {{ links[2] }} </a>     
+    </nav>
+    <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
 </div>
 <div>
-    <table>
-        <tr>
-            <td>Bill Title: </td>
-            <td>{{ currentBill.title }}</td>
-        </tr>
-        <tr>
-            <td>Total Expenditure: </td>
-            <td>$ {{ currentBill.total }}</td>
-        </tr>
-    </table>
-    <hr>
-    <table>
-        <tr>
-            <td><button type="button" [disabled]="!this.currentBill.byPercentage">
-                    By Shares</button></td>
-            <td><button (click)="splitByPercent()">By %</button></td>
-        </tr>
-    </table>
-    <br>
-    <button type="button" (click)="addReceipt()">
-        Take Photo of Receipt
-    </button>
-    <br>
-    <br>
+    <nav mat-tab-nav-bar backgroundColor="accent" [tabPanel]="tabPanel">
+        <a mat-tab-link> <mat-icon svgIcon="bar"></mat-icon> </a>
+        <a mat-tab-link (click)="splitByPercent()"> <mat-icon svgIcon="percent"></mat-icon> </a> 
+    </nav>
+    <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+</div>
+<br>
+<div>
     <form [formGroup]="form" (submit)="saveBill()">
-        <table>
-            <thead>
-                <tr>
-                    <td>No.</td>
-                    <td>Item</td>
-                    <td>Price</td>
-                    <td>Quantity</td>
-                    <td></td>
-                    <td *ngFor="let f of currentBill.friends">{{ f }}</td>
-                </tr>
-            </thead>
-            <tbody formArrayName="items">
-                <tr *ngFor="let item of itemArr.controls; let i = index" [formGroupName]="i">
+        <div *ngFor="let item of this.currentBill.items; let i = index">
+            <table>
+                <thead>
+                    <td>{{ i+1 }}. </td>
+                    <td style="width: 200px">{{ item.itemName }} (${{ (item.price * item.quantity).toFixed(2) }})</td>
                     <td>
-                        {{ (i + 1) }}
-                    <td>
-                        <input type="text" size="30" formControlName="itemName">
+                        <button mat-flat-button class="yellow-btn" type="button" (click)="equalShare(i)">
+                        Equal Shares</button>
                     </td>
-                    <td>
-                        $ <input type="number" formControlName="price" 
-                                (input)="calculateTotalPrice()">
-                    </td>
-                    <td>
-                        x <input type="number" formControlName="quantity" 
-                                (input)="calculateTotalPrice()">
-                    </td>
-                    <td>
-                        <button type="button" (click)="equalShare(i)">
-                                Equal Shares</button>
-                    </td>
-                    <td *ngFor="let f of currentBill.friends; let j = index">
-                        <input type="number" formControlName="share{{ j }}">
-                    </td>
-                    <td>
-                        <button type="button" (click)="removeItem(i)" 
-                                [disabled]="oneItemLeft()">X</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                </thead>
+                <tbody formArrayName="shares">
+                    <tr *ngFor="let f of currentBill.friends, let j = index" [formGroupName]="i">
+                        <td colspan="2" >{{ f }}</td>
+                        <td>
+                            <input type="number" formControlName="share{{ j }}" style="width: 45px">
+                            share(s)
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+            <mat-divider></mat-divider>
+        </div>
         <br>
-        <button type="button" (click)="addItem(null)">Add Item</button>
-        <ul *ngFor="let item of itemArr.controls; let i = index">
+        <p *ngIf="invalidForm()">Invalid Items:</p>
+        <ul *ngFor="let item of shareArr.controls; let i = index">
             <li *ngIf="noShares(i)">Item {{ (i + 1) }}'s total shares is 0</li>
+            <li *ngIf="shareArr.at(i).invalid">Item {{ (i + 1) }}'s has shares less than 0</li>
         </ul>
         <br>
-        <table>
-            <tr>
-                <td>Service: </td>
-                <td>
-                    <input type="number" formControlName="service" 
-                            (input)="calculateTotalPrice()">%
-                </td>
-                <td>
-                    <button type="button" (click)="exclude('service')"
-                            (click)="calculateTotalPrice()">Remove</button>
-                </td>
-            </tr>
-            <tr>
-                <td>Tax (GST): </td>
-                <td>
-                    <input type="number" formControlName="tax" 
-                            (input)="calculateTotalPrice()">%
-                </td>
-                <td>
-                    <button type="button" (click)="exclude('tax')" 
-                            (click)="calculateTotalPrice()">Remove</button>
-                </td>
-            </tr>
-        </table>
-        <br>
-        <table>
-            <tr>
-                <td>Calculated Total: </td>
-                <td>$ {{ totalPrice }}</td>
-            </tr>
-        </table>
-        <br>
-        <button type="submit" [disabled]="invalidForm()">Split bill</button>
-        <button type="button">Back</button>
+        <button mat-flat-button class="pill" color="primary" type="submit" 
+                [disabled]="invalidForm()">
+                Settle Up!
+        </button>
     </form>
 </div>

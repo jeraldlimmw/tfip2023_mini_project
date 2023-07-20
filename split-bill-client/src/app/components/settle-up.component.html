@@ -1,19 +1,23 @@
 <div>
-    <h1>Settle Up</h1>
+    <nav mat-tab-nav-bar backgroundColor="primary" [tabPanel]="tabPanel">
+        <a mat-tab-link>Settle Up!</a>    
+    </nav>
+    <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
 </div>
+<br>
 <div>
     <table>
         <tr>
-            <td>Bill ID: </td>
+            <th style="text-align: left;">Bill ID:</th>
             <td>{{ settlement.billId }}</td>
         </tr>
         <tr>
-            <td>Bill: </td>
+            <th style=" vertical-align:top; text-align: left;">Bill:</th>
             <td>{{ settlement.title }} created on {{ date }}</td>
         </tr>
         <tr>
-            <td>Total Expenditure: </td>
-            <td>{{ settlement.total }}</td>
+            <th style="width: 76px; text-align: left;">Total Paid:</th>
+            <td>${{ settlement.total }}</td>
         </tr>
     </table>
     <h3>Instructions to settle up:</h3>
@@ -21,6 +25,14 @@
         <li>{{ t.payer }} pay ${{ t.amount }} to {{ t.payee }}</li>
     </ul>
     <br>
-    <button type="button">Share on Telegram</button>
-    <button type="button">Send bill split to your email</button>
+    <button mat-flat-button class="yellow-btn" type="button" (click)="share()">
+        <mat-icon svgIcon="share"></mat-icon> Settlement
+    </button>
+    &nbsp;&nbsp;
+    <button mat-flat-button class="yellow-btn" type="button" (click)="openDialog()">
+        <mat-icon svgIcon="email"></mat-icon> Full bill
+    </button>
+    <br>
+    <br>
+    <button mat-flat-button class="pill" color="primary" [routerLink]="['/']" >Start new bill</button>
 </div>

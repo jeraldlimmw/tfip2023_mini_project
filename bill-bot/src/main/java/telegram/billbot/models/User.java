@@ -1,8 +1,8 @@
 package telegram.billbot.models;
 
-public class BillCreator {
+public class User {
     private Long userId;
-    private String firstname;
+    private String firstName;
     private String username;
 
     public Long getUserId() {
@@ -11,11 +11,11 @@ public class BillCreator {
     public void setUserId(Long userId) {
         this.userId = userId;
     }
-    public String getFirstname() {
-        return firstname;
+    public String getFirstName() {
+        return firstName;
     }
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
     public String getUsername() {
         return username;
@@ -25,6 +25,6 @@ public class BillCreator {
     }
     @Override
     public String toString() {
-        return "BillCreator [userId=" + userId + ", firstname=" + firstname + ", username=" + username + "]";
+        return "BillCreator [userId=" + userId + ", firstName=" + firstName + ", username=" + username + "]";
     }    
 }

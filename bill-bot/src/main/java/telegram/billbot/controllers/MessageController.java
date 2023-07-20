@@ -13,7 +13,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
-import telegram.billbot.models.BillCreator;
+import telegram.billbot.models.User;
 import telegram.billbot.models.SettlementMessage;
 import telegram.billbot.inlinemarkups.InlineMarkup;
 
@@ -24,7 +24,7 @@ public class MessageController {
     public void receiveSettlement(@RequestBody String json) throws IOException {
         // take message and process message
         SettlementMessage sm = new SettlementMessage();
-        BillCreator creator = new BillCreator();
+        User creator = new User();
         try (InputStream is = new ByteArrayInputStream(json.getBytes())) {
             JsonReader r = Json.createReader(is);
             JsonObject o = r.readObject();
@@ -34,7 +34,7 @@ public class MessageController {
             JsonObject creatorJson = o.getJsonObject("creator");
             creator.setUserId(Long.parseLong(creatorJson.getString("userId")));
             creator.setUsername(creatorJson.getString("username"));
-            creator.setFirstname(creatorJson.getString("firstname"));
+            creator.setFirstName(creatorJson.getString("firstname"));
             sm.setBillCreator(creator);
         }
         

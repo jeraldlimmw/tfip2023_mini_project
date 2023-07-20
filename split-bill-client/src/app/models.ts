@@ -12,6 +12,8 @@ export interface Paid {
 }
 
 export interface Bill {
+    chatId: number
+    user: User
     title: string
     total: number
     friends: string[]
@@ -22,10 +24,8 @@ export interface Bill {
     tax: number
 }
 
-export interface ReceiptResponse {
+export interface ReceiptItems {
     receiptItems: Item[]
-    receiptTotal: number
-    taxAndServiceIncl: boolean
 }
 
 export interface BillIdResponse {
@@ -44,6 +44,16 @@ export interface Settlement {
     total: number
     title: string
     transactions: Transaction[]
-    //message: string
     timestamp: number
+    message: string
+}
+
+export interface User {
+    userId : number
+    username: string
+    firstName: string
+}
+
+export interface SentResponse {
+    message: string
 }

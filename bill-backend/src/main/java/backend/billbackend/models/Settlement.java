@@ -1,13 +1,15 @@
 package backend.billbackend.models;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Settlement {
+public class Settlement implements Serializable{
     private String billId;
     private Double total;
     private String title;
     private List<Transaction> transactions;
     private long timestamp;
+    private String message;
 
     public Settlement() {
     }
@@ -46,10 +48,16 @@ public class Settlement {
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
+    public String getMessage() {
+        return message;
+    }
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
     @Override
     public String toString() {
         return "Settlement [billId=" + billId + ", total=" + total + ", title=" + title + ", transactions="
-                + transactions + ", timestamp=" + timestamp + "]";
+                + transactions + ", timestamp=" + timestamp + ", message=" + message + "]";
     }
 }

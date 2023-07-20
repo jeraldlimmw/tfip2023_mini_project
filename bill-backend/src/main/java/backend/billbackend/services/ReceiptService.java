@@ -56,7 +56,7 @@ public class ReceiptService {
 
     private File base64ToFile(String dataurl, String filename) throws FileNotFoundException, IOException {
         String[] arr = dataurl.split(",");
-        String mime = arr[0].split(":")[1].split(";")[0];
+        // String mime = arr[0].split(":")[1].split(";")[0];
         String base64Data = arr[arr.length - 1];
 
         byte[] bytes = Base64.getDecoder().decode(base64Data);

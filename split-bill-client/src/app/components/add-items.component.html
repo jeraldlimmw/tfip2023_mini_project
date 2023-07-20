@@ -1,0 +1,118 @@
+<div>
+    <nav mat-tab-nav-bar backgroundColor="primary" [tabPanel]="tabPanel">
+        <a mat-tab-link (click)="activeLink = links[0]" (click)="toFriends()"
+           [active]="activeLink == links[0]"> {{ links[0] }} </a>
+        <a mat-tab-link (click)="activeLink = links[1]"
+           [active]="activeLink == links[1]"> {{ links[1] }} </a>
+        <a mat-tab-link disabled>{{ links[2] }}</a>      
+    </nav>
+    <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+</div>
+<br>
+<div>
+    <table>
+        <tr>
+            <th style="text-align: right;">Bill Title: </th>
+            <th colspan="2">{{ currentBill.title }}</th>
+        </tr>
+        <tr>
+            <th style="text-align: right;">Total Paid: </th>
+            <td style="vertical-align: middle; width: 30px; text-align: right;">
+                <mat-icon svgIcon="dollar"></mat-icon>
+            </td>
+            <th style="vertical-align: middle;">{{ currentBill.total.toFixed(2) }}</th>
+        </tr>
+    </table>
+    <hr>
+    <br>
+    <button mat-flat-button class="yellow-btn" type="button" (click)="addReceipt()">
+        <mat-icon svgIcon="camera"></mat-icon> Add items from receipt
+    </button>
+    <br>
+    <br>
+    <form [formGroup]="form" (submit)="saveItems()">
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">Item</th>
+                    <th colspan="2">Price</th>
+                    <th></th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody formArrayName="items">
+                <tr *ngFor="let item of itemArr.controls; let i = index" [formGroupName]="i">
+                    <td>
+                        {{ (i + 1) }}.
+                    <td>
+                        <input type="text" size="20" formControlName="itemName">
+                    </td>
+                    <td>
+                        <mat-icon svgIcon="dollar"></mat-icon>
+                    </td>
+                    <td>
+                        <input type="number" formControlName="price" 
+                                style="width: 52px;" (input)="calculateTotalPrice()">
+                    </td>
+                    <td>x</td>
+                    <td>
+                        <input type="number" formControlName="quantity" 
+                                style="width: 52px;" (input)="calculateTotalPrice()">
+                    </td>
+                    <td style="text-align: left;">
+                        <button mat-icon-button type="button" (click)="removeItem(i)"
+                                (click)="calculateTotalPrice()" 
+                                [disabled]="oneItemLeft()">
+                            <mat-icon svgIcon="bin"></mat-icon>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button mat-flat-button class="orange-btn" type="button" (click)="addItem(null, null)">Add Item</button>
+        <br>
+        <br>
+        <table>
+            <tr>
+                <td>Service: </td>
+                <td>
+                    <input type="number" formControlName="service" style="width: 70px;" 
+                            (input)="calculateTotalPrice()">
+                </td>
+                <td>
+                    <mat-icon svgIcon="percent"></mat-icon>
+                </td>
+                <td>
+                    <button mat-flat-button class="orange-btn"
+                            type="button" (click)="addExtra('service')"
+                            (click)="calculateTotalPrice()">Add Service</button>
+                </td>
+            </tr>
+            <tr>
+                <td>Tax (GST): </td>
+                <td>
+                    <input type="number" formControlName="tax" style="width: 70px;" 
+                            (input)="calculateTotalPrice()">
+                </td>
+                <td>
+                    <mat-icon svgIcon="percent"></mat-icon>
+                </td>
+                <td>
+                    <button mat-flat-button class="orange-btn" 
+                            type="button" (click)="addExtra('tax')" 
+                            (click)="calculateTotalPrice()">Add GST</button>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table>
+            <tr>
+                <th>Calculated Total:</th>
+                <td style="text-align: right;"><mat-icon svgIcon="dollar"></mat-icon></td>
+                <th>{{ totalPrice.toFixed(2) }}</th>
+            </tr>
+        </table>
+        <br>
+        <button mat-flat-button class="pill" color="primary" type="submit" [disabled]="invalidForm()">Next: Split bill</button>
+    </form>
+</div>

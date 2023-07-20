@@ -1,6 +1,8 @@
 package backend.billbackend.models;
 
-public class Paid {
+import java.io.Serializable;
+
+public class Paid implements Serializable{
     private String name;
     private Double amount;
     

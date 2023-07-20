@@ -1,14 +1,14 @@
 package telegram.billbot.models;
 
 public class SettlementMessage {
-    private BillCreator billCreator;
+    private User billCreator;
     private Long chatId;
     private String text;
 
-    public BillCreator getBillCreator() {
+    public User getBillCreator() {
         return billCreator;
     }
-    public void setBillCreator(BillCreator billCreator) {
+    public void setBillCreator(User billCreator) {
         this.billCreator = billCreator;
     }
     public Long getChatId() {

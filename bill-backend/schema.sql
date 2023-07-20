@@ -1,4 +1,4 @@
-create table Transactions(
+create table transactions(
 id VARCHAR(9) NOT NULL PRIMARY KEY,
 billId VARCHAR(8) NOT NULL,
 payer VARCHAR(50) NOT NULL,
