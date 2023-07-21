@@ -9,15 +9,18 @@
     <table>
         <tr>
             <th style="text-align: left;">Bill ID:</th>
-            <td>{{ settlement.billId }}</td>
+            <td colspan="2">{{ settlement.billId }}</td>
         </tr>
         <tr>
             <th style=" vertical-align:top; text-align: left;">Bill:</th>
-            <td>{{ settlement.title }} created on {{ date }}</td>
+            <td colspan="2">{{ settlement.title }} created on {{ date }}</td>
         </tr>
         <tr>
             <th style="width: 76px; text-align: left;">Total Paid:</th>
-            <td>${{ settlement.total }}</td>
+            <td>
+                <mat-icon class="shrink" svgIcon="dollar"></mat-icon>
+            </td>
+            <td>{{ settlement.total }}</td>
         </tr>
     </table>
     <h3>Instructions to settle up:</h3>

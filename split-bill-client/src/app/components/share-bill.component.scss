@@ -1,6 +1,4 @@
-@use "@angular/material" as mat;
 @use "@material/button";
-@include mat.core();
 
 .mat-mdc-unelevated-button.orange-btn {
     background-color: #fdb133;
@@ -16,7 +14,6 @@
     background-color: #ffd600;
     border-radius: 20px;
     @include button.density(-3);
-
 }
 
 .mat-mdc-unelevated-button.pill {

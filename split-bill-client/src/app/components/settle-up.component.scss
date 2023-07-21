@@ -1,15 +1,14 @@
-@use "@angular/material" as mat;
-@include mat.core();
+@use "@material/button";
 
-.mat-mdc-unelevated-button.orange-btn {
-    background-color: #fdb133;
-    border-radius: 20px;
-}
+// .mat-mdc-unelevated-button.orange-btn {
+//     background-color: #fdb133;
+//     border-radius: 20px;
+// }
 
-.mat-mdc-unelevated-button.red-btn {
-    background-color: #ff6241;
-    border-radius: 20px;
-}
+// .mat-mdc-unelevated-button.red-btn {
+//     background-color: #ff6241;
+//     border-radius: 20px;
+// }
 
 .mat-mdc-unelevated-button.yellow-btn {
     background-color: #ffd600;
@@ -18,4 +17,10 @@
 
 .mat-mdc-unelevated-button.pill {
     border-radius: 20px;
+}
+
+.mat-icon.shrink {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
 }

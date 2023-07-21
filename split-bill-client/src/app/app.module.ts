@@ -53,7 +53,5 @@ const appRoutes: Routes = [
   ],
   providers: [BillService, ReceiptService],
   bootstrap: [AppComponent]
-  // ,
-  // entryComponents: [EmailDialogComponent]
 })
 export class AppModule { }

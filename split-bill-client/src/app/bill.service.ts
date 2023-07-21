@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import { Bill, BillIdResponse, SentResponse, Settlement } from "./models";
+import { Bill, BillIdResponse, SentResponse, Settlement, StartData } from "./models";
 
 @Injectable()
 export class BillService{
@@ -34,17 +34,19 @@ export class BillService{
     getSettlement(id: string) {
         const params = new HttpParams().set('id', id)
         return this.http.get<Settlement>("/bill/settlement", { params })
-        //return this.http.get<Settlement>(`/bill/settlement/${id}`)
     }
 
     emailBill(id: string, recipient: string) {
         return this.http.post<SentResponse>(`/bill/email/${id}`, recipient)
-        // const params = new HttpParams().set('recipient', recipient)
-        // return this.http.get<String>(`/bill/email/${id}`, { params })
     }
 
     telegramBill(id: string) {
         return this.http.post<SentResponse>('/bill/telegram', id)
+    }
+
+    startTelegramBill(qs: string) {
+        const params = new HttpParams().set('qs', qs)
+        return this.http.get<StartData>('/bill/start', { params })
     }
 
     resetBill() {

@@ -1,6 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { BillService } from '../bill.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-start',
@@ -13,12 +15,29 @@ export class StartComponent implements OnInit{
   router = inject(Router)
 
   ngOnInit(): void {
-    this.billSvc.bill.chatId = this.activatedRoute.snapshot.queryParams['chat_id']
-    this.billSvc.bill.user.userId = this.activatedRoute.snapshot.queryParams['user_id']
-    this.billSvc.bill.user.username = this.activatedRoute.snapshot.queryParams['username']
-    this.billSvc.bill.user.firstName = this.activatedRoute.snapshot.queryParams['firstName']
-    console.info(this.billSvc.bill)
+    const query = this.activatedRoute.snapshot.queryParams['qs']
+    console.info(query)
 
-    this.router.navigate(['/']);
+    firstValueFrom(this.billSvc.startTelegramBill(query))
+      .then(data => { console.info(data)
+        // if (!data.user || !data.chatId)
+        this.billSvc.bill.chatId = data.chatId
+        this.billSvc.bill.user = data.user
+        console.info(this.billSvc.bill)
+        this.router.navigate(['/']);
+      })
+      .catch(err => {
+        this.openSnackBar("Could not retrieve data from Telegram", "Close")
+        this.router.navigate(['/']);
+      })
+  }
+
+  // Mat snack bar notification
+  _snackBar = inject(MatSnackBar)
+
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      duration: 3000
+    });
   }
 }

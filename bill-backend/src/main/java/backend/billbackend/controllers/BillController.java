@@ -21,7 +21,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import backend.billbackend.models.Bill;
 import backend.billbackend.models.Settlement;
+import backend.billbackend.models.StartData;
+import backend.billbackend.models.User;
 import backend.billbackend.services.BillEmailService;
+import backend.billbackend.services.DecryptionService;
 import backend.billbackend.services.SplitService;
 import backend.billbackend.services.TelegramService;
 import jakarta.mail.MessagingException;
@@ -37,6 +40,9 @@ public class BillController {
 
     @Autowired
     private TelegramService teleSvc;
+
+    @Autowired
+    private DecryptionService decryptSvc;
 
     // Post method to get Bill object
     @PostMapping(path="/store")
@@ -83,7 +89,7 @@ public class BillController {
                     .body(settlementJson);
     }
 
-    @PostMapping(path="email/{id}")
+    @PostMapping(path="/email/{id}")
     @ResponseBody
     public ResponseEntity<String> sendEmailByBillId(@PathVariable String id, @RequestBody String recipient) {
         System.out.println(">>>> Controller: bill id = " +  id);
@@ -99,7 +105,7 @@ public class BillController {
         return ResponseEntity.ok("{\"message\": \"email sent\"}");
     }
 
-    @PostMapping(path="telegram")
+    @PostMapping(path="/telegram")
     @ResponseBody
     public ResponseEntity<String> sendSettlementToTelegram(@RequestBody String id) {
         try {
@@ -110,5 +116,32 @@ public class BillController {
         }
 
         return ResponseEntity.ok("{\"message\": \"telegram sent\"}");
+    }
+
+    @GetMapping(path="/start")
+    @ResponseBody
+    public ResponseEntity<String> startBillFromTelegramUrl(@RequestParam String qs) {
+        String userData = decryptSvc.decrypt(qs);
+        String[] data = userData.split(":{3}");
+
+        StartData startData = new StartData();
+        startData.setChatId(Long.parseLong(data[0]));
+        User user = new User();
+        user.setUserId(Long.parseLong(data[1]));
+        user.setFirstName(data[2]);
+        user.setUsername(data[3]);
+        startData.setUser(user);
+        System.out.println(">>>> Data: " + startData.toString());
+
+        ObjectMapper mapper = new ObjectMapper();
+        String startDataJson = "";
+        try {
+            startDataJson = mapper.writeValueAsString(startData);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.ok()
+                .body(startDataJson);
     }
 }

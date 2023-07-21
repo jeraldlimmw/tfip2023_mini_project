@@ -38,9 +38,9 @@ export class AddFriendsComponent implements OnInit{
       this.totalAmount = this.currentBill.total
     } else {
       const name = (!!this.currentBill.user.firstName) ? 
-          this.currentBill.user.firstName : "me"
+          this.currentBill.user.firstName : "(your name)"
       this.addFriend(name, 0)
-      this.addFriend('friend1', 0)
+      this.addFriend('(your friend)', 0)
     }
   }
 

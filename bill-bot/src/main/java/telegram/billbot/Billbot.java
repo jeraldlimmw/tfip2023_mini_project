@@ -1,26 +1,17 @@
 package telegram.billbot;
 
+import static telegram.billbot.constants.Information.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import jakarta.annotation.PreDestroy;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
 import telegram.billbot.inlinemarkups.InlineMarkup;
-import telegram.billbot.models.User;
-
-import static telegram.billbot.constants.Information.*;
+import telegram.billbot.services.Encryptor;
 
 @Component
 public class Billbot extends TelegramLongPollingBot{
@@ -41,28 +32,39 @@ public class Billbot extends TelegramLongPollingBot{
     public String getBotToken() {
         return env.getProperty("telegram.bot.token");
     }
+
+    public String getEncryptionKey() {
+        return env.getProperty("telegram.bot.encryption.key");
+    }
 	
 	@Override
     public void onUpdateReceived(Update update) {
+		Encryptor encryptor = new Encryptor();
+
         System.out.println(">>>> Update received");
         if (update.hasMessage() && update.getMessage().hasText()) {
 			String text = update.getMessage().getText();
 			System.out.println(text);
 			long chatId = update.getMessage().getChatId();
             System.out.println(chatId);
-			User user = new User();
-			user.setFirstName(update.getMessage().getFrom().getFirstName());
-			user.setUsername(update.getMessage().getFrom().getUserName());
-			user.setUserId(update.getMessage().getFrom().getId());
+			String br = ":::";
+			String userData = String.valueOf(chatId)
+					+ br + update.getMessage().getFrom().getId().toString() 
+					+ br + update.getMessage().getFrom().getFirstName() 
+					+ br + update.getMessage().getFrom().getUserName();
+			String encryptedData = encryptor.encrypt(userData, getEncryptionKey());
+			System.out.println(encryptedData);
 
 			SendMessage message = new SendMessage();
 
 			switch (text) {
-				case "/start" -> message = onStartCmd(chatId, user);
+				case "/start" -> message = onStartCmd(chatId, encryptedData);
 
-				case "/start@billbuddy_bot" -> message = onStartCmd(chatId, user);
+				case "/start@billbuddy_bot" -> message = onStartCmd(chatId, encryptedData);
 				
 				case "/help" -> message = onHelpCmd(chatId);
+
+				case "/help@billbuddy_bot" -> message = onHelpCmd(chatId);
 
 				default -> message = onUnknownCmd(chatId);
 			}
@@ -73,46 +75,14 @@ public class Billbot extends TelegramLongPollingBot{
 				e.printStackTrace();
 			}
 		} 
-		/* 
-		else if (update.hasCallbackQuery()) {
-			CallbackQuery callback = update.getCallbackQuery();
-			String data = callback.getData();
-			Long chatId = callback.getMessage().getChatId();
-
-			switch (data) {
-				case "Split bill":
-					// String firstName = callback.getFrom().getFirstName();
-					// String username = callback.getFrom().getUserName();
-					// Long userId = callback.getFrom().getId();
-
-					// redirectToWebpage(chatId, firstname, username, userId);
-					break;
-				// case "paid":
-					
-                //     pmToCreator(userId);
-                //     break;
-				default:
-					;
-			}
-			
-			AnswerCallbackQuery answer = new AnswerCallbackQuery();
-			answer.setCallbackQueryId(callback.getId());
-
-			try {
-				execute(answer);
-			} catch (TelegramApiException e) {
-				e.printStackTrace();
-			}
-		}
-		*/
     }
 
-	private SendMessage onStartCmd(Long chatId, User user) {
+	private SendMessage onStartCmd(Long chatId, String encryptedData) {
         SendMessage message = new SendMessage();
 		message.setChatId(chatId);
 		message.setText(START_MESSAGE);
         InlineMarkup im = new InlineMarkup();
-		message.setReplyMarkup(im.createSplitButton(chatId, user));
+		message.setReplyMarkup(im.createSplitButton(chatId, encryptedData));
 		return message;
     }
 
@@ -127,42 +97,8 @@ public class Billbot extends TelegramLongPollingBot{
 		SendMessage message = new SendMessage();
 		message.setChatId(chatId);
         message.setText(
-			"Sorry, I couldn't understand that. Try using the inline buttons."
+			"Sorry, I couldn't understand that. Try using one of the commands or the inline buttons."
 		);
 		return message;    
-	}
-
-	/*
-    private void payCmd() {
-
-    }
-
-    private void paidCmd() {
-
-    } 
-
-	private void redirectToWebpage(Long chatId, String firstname, String username, Long userId) {
-		JsonObject jo = Json.createObjectBuilder()
-							.add("chatId", chatId)
-							.add("firstname", firstname)
-							.add("username", username)
-							.add("userId", userId)
-							.build();
-		
-		RestTemplate template = new RestTemplate();
-
-		RequestEntity<String> request = RequestEntity.post(null)
-									.accept(MediaType.APPLICATION_JSON)
-									.body(jo.toString());
-
-		ResponseEntity<String> response = template.exchange(request, String.class);
-
-		System.out.println(response.getBody());
-	}
-	*/
-
-	@PreDestroy
-	public void destroy() {
-		
 	}
 }

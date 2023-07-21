@@ -17,23 +17,24 @@
                 <td colspan="3">
                         &nbsp;<input type="text" size="35" formControlName="title"
                         placeholder="Give your bill a title">
+                        <span *ngIf="invalidField('title')" class="error">
+                            <br>&nbsp;must give bill a title
+                        </span>
                 </td>
                 <td>
-                    <span *ngIf="invalidField('title')">
-                        Invalid title
-                    </span>
+                    
                 </td>
             </tr>
             <tr>
                 <th style="text-align: right;">Total Paid:</th>
                 <td style="vertical-align: middle; text-align: right; width: 30px;">
-                    <mat-icon svgIcon="dollar"></mat-icon> 
+                    <mat-icon class="shrink" svgIcon="dollar"></mat-icon> 
                 </td>
                 <td style="text-align: left">
                     {{ totalAmount.toFixed(2) }}
                 </td>
                 <td>
-                    <span *ngIf="totalAmount < 1">
+                    <span *ngIf="totalAmount < 1" class="error">
                         (must be more than $1.00)
                     </span>
                 </td>
@@ -52,9 +53,12 @@
                 <tr *ngFor="let f of friendsArr.controls; let i = index" [formGroupName]="i">
                     <td style="vertical-align: middle;">
                         <input type="text" size="25" formControlName="name">
+                        <span *ngIf="invalidFriendName(i, 'name')" class="error">
+                            <br>must be more than 2 characters
+                        </span>
                     </td>
                     <td style="vertical-align: middle; width:30px; text-align: right;">
-                        <mat-icon svgIcon="dollar"></mat-icon>
+                        <mat-icon class="shrink" svgIcon="dollar"></mat-icon>
                     </td>
                     <td style="vertical-align: middle;">
                         <input type="number" style="width: 70px;" formControlName="amount" 
@@ -67,11 +71,6 @@
                             <mat-icon svgIcon="bin"></mat-icon>
                         </button>
                     </td>
-                    <td>
-                        <span *ngIf="invalidFriendName(i, 'name')">
-                            Name must be more than 2 characters
-                        </span>
-                    </td>
                 </tr>
                 <tr>
                     <td>
@@ -83,7 +82,9 @@
                     <br>
                 <tr>
                     <td>
-                        <button mat-flat-button class="pill" color="accent" type="submit" [disabled]="invalidForm()">Next: Add items</button>
+                        <button mat-flat-button class="pill" color="accent" type="submit" [disabled]="invalidForm()">
+                            Next: Add items
+                        </button>
                     </td>
                 </tr>
             </tbody>

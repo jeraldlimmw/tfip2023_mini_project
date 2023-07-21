@@ -122,6 +122,18 @@ export class AddItemsComponent {
     return this.itemArr.length < 2
   }
 
+  noName(i: number, itemName: string) {
+    return !!(this.itemArr.at(i).get(itemName)?.invalid 
+        && this.itemArr.at(i).get(itemName)?.dirty)
+  }
+
+  lessThanZero(i: number, price: string, quantity: string) {
+    return !!(this.itemArr.at(i).get(price)?.invalid 
+        && this.itemArr.at(i).get(price)?.dirty) || 
+        !!(this.itemArr.at(i).get(quantity)?.invalid 
+        && this.itemArr.at(i).get(quantity)?.dirty)
+  }
+
   incorrectTotal() {
     return this.totalPrice < (this.currentBill.total - 0.025) || 
         this.totalPrice > (this.currentBill.total + 0.025)

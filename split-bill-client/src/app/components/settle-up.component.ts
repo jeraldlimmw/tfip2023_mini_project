@@ -17,7 +17,7 @@ export class SettleUpComponent implements OnInit{
   activatedRoute = inject(ActivatedRoute)
   billSvc = inject(BillService)
   
-  canShare = false
+  // canShare = false
   settlement!: Settlement
   email!: string
   id!: string
@@ -25,7 +25,7 @@ export class SettleUpComponent implements OnInit{
 
   ngOnInit(): void {
     this.id = this.activatedRoute.snapshot.params['billId']
-    this.canShare = !!navigator.share // T/F
+    // this.canShare = !!navigator.share
     
     lastValueFrom(this.billSvc.getSettlement(this.id))
         .then(result => { 
@@ -103,5 +103,4 @@ export class SettleUpComponent implements OnInit{
       duration: 3000
     });
   }
-
 }

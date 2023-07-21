@@ -57,3 +57,8 @@ export interface User {
 export interface SentResponse {
     message: string
 }
+
+export interface StartData {
+    chatId: number
+    user: User
+}
