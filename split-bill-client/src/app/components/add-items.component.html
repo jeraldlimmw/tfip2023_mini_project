@@ -17,7 +17,7 @@
         </tr>
         <tr>
             <th style="text-align: right;">Total Paid: </th>
-            <td style="vertical-align: middle; width: 30px; text-align: right;">
+            <td style="vertical-align: middle; text-align: right; width: 20px;">
                 <mat-icon class="shrink" svgIcon="dollar"></mat-icon>
             </td>
             <th style="vertical-align: middle;">{{ currentBill.total.toFixed(2) }}</th>
@@ -35,7 +35,8 @@
             <thead>
                 <tr>
                     <th colspan="2">Item</th>
-                    <th colspan="2">Price</th>
+                    <th></th>
+                    <th style="text-align: left;">Price</th>
                     <th></th>
                     <th>Quantity</th>
                 </tr>
@@ -53,7 +54,7 @@
                             <br>price/quantity less than 0
                         </span>
                     </td>
-                    <td>
+                    <td style="text-align: right; width: 30px;">
                         <mat-icon class="shrink" svgIcon="dollar"></mat-icon>
                     </td>
                     <td>

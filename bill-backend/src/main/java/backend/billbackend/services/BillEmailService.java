@@ -128,9 +128,9 @@ public class BillEmailService {
         summary = summary 
                 + String.format("Total Expenditure: $ %.2f", bill.getTotal())
                 + "<br><br>"
-                + "Kindly brought to you by blllbuddy!"
-                + "<br><br>"
-                + "#IMAGE PLACEHOLDER";
+                + "Kindly brought to you by blllbuddy!";
+                // + "<br><br>"
+                // + "#IMAGE PLACEHOLDER";
 
         return summary;
     }
