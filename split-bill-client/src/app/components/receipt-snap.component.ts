@@ -22,8 +22,7 @@ export class ReceiptSnapComponent {
   viewHeight = 0
 
   ngOnInit(): void {
-    this.viewWidth = 480
-    //window.innerWidth * 1
+    this.viewWidth = window.innerWidth * 0.99
     this.viewHeight = window.innerHeight * 0.8
   }
 

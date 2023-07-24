@@ -5,7 +5,7 @@
     <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
 </div>
 <br>
-<div>
+<div class="center-it">
     <table>
         <tr>
             <th style="text-align: left;">Bill ID:</th>
@@ -20,12 +20,12 @@
             <td>
                 <mat-icon class="shrink" svgIcon="dollar"></mat-icon>
             </td>
-            <td>{{ settlement.total }}</td>
+            <td style="text-align: left">{{ settlement.total.toFixed(2) }}</td>
         </tr>
     </table>
     <h3>Instructions to settle up:</h3>
     <ul *ngFor="let t of settlement.transactions">
-        <li>{{ t.payer }} pay ${{ t.amount }} to {{ t.payee }}</li>
+        <li>{{ t.payer }} pay ${{ t.amount.toFixed(2) }} to {{ t.payee }}</li>
     </ul>
     <br>
     <button mat-flat-button class="yellow-btn" type="button" (click)="share()">

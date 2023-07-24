@@ -17,18 +17,20 @@
     <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
 </div>
 <br>
-<div>
+<div class="center-it">
     <form [formGroup]="form" (submit)="saveBill()">
         <div *ngFor="let item of this.currentBill.items; let i = index">
             <table>
                 <thead>
                     <td>{{ i+1 }}. </td>
-                    <td style="width: 200px">{{ item.itemName }} (${{ (item.price * item.quantity).toFixed(2) }})</td>
+                    <td style="width: 205px">{{ item.itemName }} (${{ (item.price * item.quantity).toFixed(2) }})</td>
                 </thead>
                 <tbody formArrayName="percentShares">
                     <tr *ngFor="let f of currentBill.friends, let j = index" [formGroupName]="i">
                         <td colspan="2">{{ f }}</td>
-                        <td><input type="number" formControlName="percent{{ j }}" style="width: 45px"> %</td>
+                        <td style="text-align: right;">
+                            <input type="number" formControlName="percent{{ j }}" style="width: 50px"> %
+                        </td>
                     </tr>
                 </tbody>
             </table>

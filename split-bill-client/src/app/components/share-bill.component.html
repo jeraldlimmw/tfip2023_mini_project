@@ -17,7 +17,7 @@
     <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
 </div>
 <br>
-<div>
+<div class="center-it">
     <form [formGroup]="form" (submit)="saveBill()">
         <div *ngFor="let item of this.currentBill.items; let i = index">
             <table>
@@ -25,7 +25,7 @@
                     <td>
                         {{ i+1 }}.
                     </td>
-                    <td style="width: 200px">
+                    <td style="width: 205px">
                         {{ item.itemName }} (${{ (item.price * item.quantity).toFixed(2) }})
                     </td>
                     <td>
@@ -38,8 +38,8 @@
                 <tbody formArrayName="shares">
                     <tr *ngFor="let f of currentBill.friends, let j = index" [formGroupName]="i">
                         <td colspan="2" >{{ f }}</td>
-                        <td>
-                            <input type="number" formControlName="share{{ j }}" style="width: 45px">
+                        <td style="text-align: right;">
+                            <input type="number" formControlName="share{{ j }}" style="width: 50px">
                             share(s)
                         </td>
                     </tr>

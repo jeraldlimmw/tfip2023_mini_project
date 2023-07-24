@@ -13,7 +13,7 @@ public class InlineMarkup {
         InlineKeyboardMarkup ikm = new InlineKeyboardMarkup();
         InlineKeyboardButton ikb = new InlineKeyboardButton("Split bill");
         ikb.setCallbackData("split bill");
-        String url = "https://billbuddyv1-production.up.railway.app/#/start?qs="
+        String url = "https://billbuddy.jeraldlim.com/#/start?qs="
                     + encryptedUser;
         System.out.println(url);
         ikb.setUrl(url);

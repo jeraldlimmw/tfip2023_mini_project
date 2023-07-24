@@ -1,6 +1,6 @@
 # PART 1: Creating a container
 # create an image based off this image
-FROM maven:3.8-openjdk-18-slim AS builder
+FROM maven:3.8.5-openjdk-17-slim AS builder
 
 # create a directory and cd into the directory
 WORKDIR /src
@@ -19,7 +19,7 @@ RUN mvn package -Dmaven.test.skip=true
 
 # PART 2: Creating a second container in first container
 # run the application from the container
-FROM openjdk:18-slim
+FROM openjdk:17-slim
 
 WORKDIR /src
 

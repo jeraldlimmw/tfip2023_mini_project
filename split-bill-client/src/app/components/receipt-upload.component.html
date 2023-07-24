@@ -8,14 +8,14 @@
     <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
 </div>
 <br>
-<div>
+<div class="center-it">
     <button mat-flat-button class="red-btn" type="button" 
     [routerLink]="[ '/receipt' ]">Back</button>
 </div>
 <br>
-<div align="center">
-    <img [src]="photo" width="480">
-<br>
-<br>
+<div class="center-it" align="center">
+    <img [src]="photo" max-width="420">
+    <br>
+    <br>
     <button mat-flat-button class="yellow-btn" type="button" (click)="upload()">Upload</button>
 </div>
