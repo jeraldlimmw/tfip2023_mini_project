@@ -48,7 +48,7 @@ const appRoutes: Routes = [
   ],
   imports: [
     BrowserModule, HttpClientModule, ReactiveFormsModule, WebcamModule,
-    RouterModule.forRoot(appRoutes, {useHash : true}),
+    RouterModule.forRoot(appRoutes),
     BrowserAnimationsModule, MaterialModule, IconModule
   ],
   providers: [BillService, ReceiptService],

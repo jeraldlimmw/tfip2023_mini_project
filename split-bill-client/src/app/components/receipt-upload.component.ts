@@ -32,7 +32,7 @@ export class ReceiptUploadComponent implements OnInit{
       .then(result => {
         this.billSvc.bill.items = result.receiptItems
         //alert('posted')
-        this.router.navigate([ '/bill-share' ])
+        this.router.navigate([ '/items' ])
       })
       .catch(err => {
         alert(JSON.stringify(err))
